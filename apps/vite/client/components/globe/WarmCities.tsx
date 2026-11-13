@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import { Tower } from "./ColdCities"
 import { M } from "./materials"
+import { BeachUmbrella, Garland, Gift, LightArch, Nativity, NochebuenaTable, Wreath } from "./HolidayDecor"
 import { Ball, Block, Cyl, Cypress, Lamp, Palm, SunOrnament, Tree } from "./primitives"
 
 const Q = Math.PI / 4
@@ -30,11 +31,15 @@ export function Tokyo() {
         <Block p={[0, 0.27, 0]} s={[0.3, 0.03, 0.04]} m={M.red} />
         <Block p={[0, 0.32, 0]} s={[0.38, 0.035, 0.05]} m={M.redDeep} />
       </group>
-      <Tree p={[0.12, 0, 0.55]} h={0.42} />
+      <Tree p={[0.12, 0, 0.55]} h={0.62} />
       <Lamp p={[-0.15, 0, 0.75]} />
       <Lamp p={[0.8, 0, -0.15]} />
       <Ball p={[0.38, 0.03, 0.72]} r={0.03} m={M.gold} />
       <Ball p={[-0.82, 0.03, 0.05]} r={0.03} m={M.gold} />
+      <LightArch p={[0.59, 0, -0.1]} width={0.42} h={0.69} rot={-0.15} />
+      <Gift p={[-0.13, 0, 0.65]} size={0.14} />
+      <Gift p={[0.36, 0, 0.75]} size={0.12} green />
+      <Garland p={[-0.55, 0.29, 0.524]} width={0.28} drop={0.06} rotY={0.4} foliage={false} />
     </group>
   )
 }
@@ -67,7 +72,11 @@ export function BuenosAires() {
         <Cyl p={[0.1, 0.035, 0.07]} rt={0.035} rb={0.035} h={0.025} r={[Math.PI / 2, 0, 0]} m={M.greenDeep} />
         <Cyl p={[-0.1, 0.035, 0.07]} rt={0.035} rb={0.035} h={0.025} r={[Math.PI / 2, 0, 0]} m={M.greenDeep} />
       </group>
-      <Tree p={[-0.24, 0, 0.24]} h={0.38} />
+      <Tree p={[-0.24, 0, 0.24]} h={0.61} />
+      <NochebuenaTable p={[-0.59, 0, 0.77]} rot={0.25} />
+      <Gift p={[-0.29, 0, 0.59]} size={0.15} />
+      <Gift p={[0.12, 0, 0.85]} size={0.11} green rot={-0.2} />
+      <Wreath p={[0, 0.39, -0.091]} r={0.075} />
     </group>
   )
 }
@@ -112,8 +121,12 @@ export function Rome() {
       <Cypress p={[-0.86, 0, -0.25]} h={0.5} />
       <Cypress p={[0.8, 0, 0.12]} h={0.42} />
       <Cypress p={[0.62, 0, 0.52]} h={0.34} />
-      <Tree p={[0.22, 0, 0.62]} h={0.5} />
+      <Tree p={[0.22, 0, 0.62]} h={0.67} />
       <Lamp p={[-0.3, 0, 0.66]} />
+      <Nativity p={[-0.56, 0, 0.66]} rot={0.25} />
+      <Wreath p={[0, 0.255, 0.347]} r={0.085} />
+      <Gift p={[0.48, 0, 0.77]} size={0.13} />
+      <Gift p={[0.09, 0, 0.9]} size={0.1} green />
     </group>
   )
 }
@@ -151,8 +164,17 @@ export function Sydney() {
       <SunOrnament p={[-0.6, 1.05, -0.5]} r={0.18} />
       <Palm p={[0.55, 0, 0.3]} h={0.6} lean={-0.1} />
       <Palm p={[-0.7, 0, 0.45]} h={0.5} lean={0.15} rotY={2.2} />
-      <Tree p={[0.14, 0, 0.56]} h={0.34} />
-      <Ball p={[-0.25, 0.1, 0.62]} r={0.12} s={[0.35, 1, 0.08]} rot={[0, 0.3, 0.2]} m={M.red} />
+      <Tree p={[0.14, 0, 0.56]} h={0.56} />
+      <group position={[-0.28, 0, 0.68]} rotation={[0, 0.3, -0.15]}>
+        <Ball p={[0, 0.18, 0]} r={0.18} s={[0.3, 1, 0.12]} m={M.red} />
+        <Block p={[0, 0.18, 0.024]} s={[0.015, 0.28, 0.01]} m={M.gold} />
+        <Cyl p={[0, 0.38, 0]} rt={0} rb={0.047} h={0.11} m={M.red} r={[0, 0, -0.2]} />
+        <Ball p={[0, 0.328, 0]} r={0.047} s={[1.05, 0.25, 0.6]} m={M.ivory} />
+        <Ball p={[0.012, 0.435, 0]} r={0.019} m={M.ivory} />
+      </group>
+      <BeachUmbrella p={[0.64, 0, 0.7]} />
+      <Gift p={[-0.48, 0, 0.8]} size={0.13} green />
+      <Wreath p={[0.5, 0.26, -0.49]} r={0.065} rotY={-0.6} />
     </group>
   )
 }
@@ -192,8 +214,12 @@ export function Dubai() {
       <Palm p={[0.5, 0, 0.25]} h={0.55} lean={-0.1} />
       <Palm p={[-0.45, 0, 0.35]} h={0.62} lean={0.1} rotY={2.5} />
       <Palm p={[0.74, 0, 0.48]} h={0.4} lean={0.12} rotY={1} />
-      <Tree p={[-0.12, 0, 0.6]} h={0.36} />
+      <Tree p={[-0.12, 0, 0.6]} h={0.58} />
       <Lamp p={[0.18, 0, 0.3]} />
+      <LightArch p={[-0.63, 0, 0.66]} width={0.4} h={0.6} rot={0.2} />
+      <Gift p={[0.17, 0, 0.75]} size={0.17} />
+      <Gift p={[0.35, 0, 0.67]} size={0.12} green rot={0.2} />
+      <Wreath p={[0.46, 0.34, 0.286]} r={0.066} />
     </group>
   )
 }
@@ -215,7 +241,14 @@ export function Rio() {
       <Palm p={[-0.6, 0, 0.4]} h={0.55} lean={0.15} />
       <Palm p={[0.45, 0, 0.45]} h={0.5} lean={-0.1} rotY={0.4} />
       <Palm p={[-0.78, 0, -0.02]} h={0.45} lean={0.1} rotY={1.4} />
-      <Tree p={[0.08, 0, 0.55]} h={0.34} />
+      <group position={[0.08, 0, 0.55]}>
+        <Ball p={[0, 0.012, 0]} r={0.34} s={[1.32, 0.065, 1]} m={M.greenDeep} />
+        <Cyl p={[0, 0.045, 0]} rt={0.22} rb={0.23} h={0.045} m={M.gold} />
+        <Tree p={[0, 0.07, 0]} h={0.65} />
+      </group>
+      <BeachUmbrella p={[-0.58, 0, 0.77]} />
+      <Gift p={[0.39, 0, 0.8]} size={0.14} />
+      <Wreath p={[-0.54, 0.33, 0.43]} r={0.065} />
     </group>
   )
 }

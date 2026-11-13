@@ -2,6 +2,7 @@ import { useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { M } from "./materials"
+import { Garland, Gift, LightArch, MarketStall, Pinata, Rink, Sleigh, Wreath } from "./HolidayDecor"
 import { Ball, Block, Cyl, House, Lamp, Palm, Snowman, SunOrnament, Tree, type V3 } from "./primitives"
 
 const Q = Math.PI / 4
@@ -48,6 +49,9 @@ export function SanFrancisco() {
         <House p={[-0.22, 0, 0]} w={0.2} h={0.3} roof={M.red} />
         <House p={[0, 0, 0]} w={0.2} h={0.34} roof={M.green} />
         <House p={[0.22, 0, 0]} w={0.2} h={0.28} roof={M.redDeep} />
+        <Wreath p={[-0.22, 0.23, 0.108]} r={0.043} />
+        <Wreath p={[0, 0.27, 0.108]} r={0.043} />
+        <Wreath p={[0.22, 0.21, 0.108]} r={0.043} />
       </group>
 
       <group position={[0.46, 0, 0.38]} rotation={[0, -0.45, 0]}>
@@ -60,9 +64,12 @@ export function SanFrancisco() {
         <Cyl p={[-0.1, 0.035, 0.06]} rt={0.03} rb={0.03} h={0.02} r={[Math.PI / 2, 0, 0]} m={M.greenDeep} />
       </group>
 
-      <Tree p={[0.04, 0, 0.58]} h={0.42} />
+      <Tree p={[0.04, 0, 0.58]} h={0.64} />
       <Lamp p={[0.78, 0, -0.08]} />
       <Lamp p={[-0.22, 0, 0.72]} />
+      <Garland p={[0, 0.77, -0.38]} width={0.75} drop={0.17} foliage={false} rotY={-0.15} />
+      <Gift p={[0.26, 0, 0.81]} size={0.14} />
+      <Gift p={[-0.11, 0, 0.85]} size={0.11} green />
     </group>
   )
 }
@@ -91,7 +98,11 @@ export function Cancun() {
         <Cyl p={[0, 0.33, 0]} rt={0} rb={0.17} h={0.08} seg={16} m={M.red} />
         <Block p={[0.12, 0.01, 0.08]} s={[0.1, 0.012, 0.2]} round={0.004} m={M.ivory} />
       </group>
-      <Tree p={[-0.14, 0, 0.62]} h={0.34} />
+      <Tree p={[-0.14, 0, 0.62]} h={0.56} />
+      <Pinata p={[-0.5, 0.35, 0.3]} />
+      <Gift p={[0.13, 0, 0.82]} size={0.15} />
+      <Gift p={[-0.35, 0, 0.83]} size={0.11} green />
+      <Wreath p={[0.654, 0.31, 0.158]} r={0.066} />
     </group>
   )
 }
@@ -113,8 +124,7 @@ export function Toronto() {
         <Ball p={[0, 0.1, 0]} r={0.29} s={[1, 0.5, 1]} m={M.ivory} />
         <Cyl p={[0, 0.1, 0]} rt={0.302} rb={0.302} h={0.015} seg={48} m={M.gold} />
       </group>
-      <group position={[-0.05, 0, 0.42]}>
-        <Cyl p={[0, 0.006, 0]} rt={0.28} rb={0.28} h={0.012} seg={48} m={M.ivory} />
+      <group position={[-0.05, 0, 0.17]}>
         <mesh position={[-0.16, 0, 0]} material={M.cream} castShadow>
           <torusGeometry args={[0.13, 0.016, 10, 32, Math.PI]} />
         </mesh>
@@ -124,10 +134,14 @@ export function Toronto() {
         <Block p={[0, 0.14, 0]} s={[0.62, 0.025, 0.04]} m={M.cream} />
       </group>
       <House p={[0.62, 0, 0.22]} rotY={-0.5} roof={M.red} />
-      <Tree p={[-0.66, 0, 0.08]} h={0.5} snow />
+      <Tree p={[-0.66, 0, 0.08]} h={0.67} snow />
       <Tree p={[0.78, 0, -0.02]} h={0.34} snow />
       <Snowman p={[-0.46, 0, 0.64]} />
       <Lamp p={[0.36, 0, 0.66]} />
+      <Rink p={[-0.05, 0, 0.51]} scale={1.05} />
+      <MarketStall p={[0.72, 0, 0.65]} rot={-0.3} snow />
+      <Gift p={[-0.7, 0, 0.45]} size={0.14} />
+      <Gift p={[-0.8, 0, 0.6]} size={0.105} green />
     </group>
   )
 }
@@ -177,7 +191,11 @@ export function Bangkok() {
       <SunOrnament p={[-0.62, 1.04, -0.48]} r={0.16} />
       <Palm p={[0.74, 0, -0.12]} h={0.55} lean={-0.12} />
       <Palm p={[-0.78, 0, -0.18]} h={0.5} lean={0.12} rotY={2.3} />
-      <Tree p={[0.02, 0, 0.6]} h={0.36} />
+      <Tree p={[0.02, 0, 0.6]} h={0.62} />
+      <LightArch p={[-0.62, 0, 0.68]} width={0.4} h={0.64} rot={0.3} />
+      <Gift p={[-0.2, 0, 0.8]} size={0.145} />
+      <Gift p={[0.23, 0, 0.81]} size={0.12} green />
+      <Wreath p={[0.59, 0.2, 0.55]} r={0.055} rotY={-0.5} />
     </group>
   )
 }
@@ -227,12 +245,14 @@ export function Vienna() {
         <Cyl p={[0, 1.2, 0.3]} rt={0.003} rb={0.012} h={0.1} seg={8} m={M.gold} />
       </group>
       <FerrisWheel p={[0.38, 0, -0.38]} />
-      <House p={[-0.66, 0, 0.36]} w={0.2} h={0.16} roof={M.red} rotY={0.7} />
-      <House p={[0.66, 0, 0.26]} w={0.2} h={0.16} roof={M.red} rotY={-0.7} />
-      <Tree p={[0, 0, 0.42]} h={0.6} snow />
+      <MarketStall p={[-0.67, 0, 0.4]} rot={0.6} snow />
+      <MarketStall p={[0.67, 0, 0.32]} rot={-0.6} snow />
+      <Tree p={[0, 0, 0.42]} h={0.72} snow />
       <Tree p={[-0.32, 0, 0.7]} h={0.3} snow />
-      <Snowman p={[0.38, 0, 0.66]} />
+      <Snowman p={[0.82, 0, -0.04]} />
       <Lamp p={[-0.06, 0, 0.84]} />
+      <Sleigh p={[0.51, 0, 0.75]} rot={-0.25} />
+      <Gift p={[0.27, 0, 0.53]} size={0.14} green />
     </group>
   )
 }

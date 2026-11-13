@@ -6,7 +6,7 @@ import { flakeMaterial, glitterMaterial } from "./materials"
 import { P } from "./palette"
 import { RMAX, floorAt, type ShakeState } from "./shake"
 
-const GLITTER = [P.gold, P.gold, P.goldSoft, P.gold, P.goldSoft, P.red, P.porcelain]
+const GLITTER = [P.gold, P.goldSoft, P.red, P.gold, P.porcelain, P.fir, P.red]
 
 interface Props {
   climate: Climate
@@ -16,11 +16,11 @@ interface Props {
 
 export function Particles({ climate, density, shake }: Props) {
   const snow = climate === "snow"
-  const count = Math.round((snow ? 1450 : 650) * density)
+  const count = Math.round((snow ? 3600 : 2200) * Math.max(0.75, density))
   const ref = useRef<THREE.InstancedMesh>(null)
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const geo = useMemo(
-    () => (snow ? new THREE.IcosahedronGeometry(0.0048, 0) : new THREE.PlaneGeometry(0.011, 0.007)),
+    () => (snow ? new THREE.IcosahedronGeometry(0.007, 0) : new THREE.PlaneGeometry(0.016, 0.01)),
     [snow],
   )
 
@@ -30,6 +30,7 @@ export function Particles({ climate, density, shake }: Props) {
     const rot = new Float32Array(count * 3)
     const spin = new Float32Array(count * 3)
     const sc = new Float32Array(count)
+    const age = new Float32Array(count).fill(1)
     const rest = new Uint8Array(count)
     for (let i = 0; i < count; i++) {
       let x = 0
@@ -42,11 +43,12 @@ export function Particles({ climate, density, shake }: Props) {
         if (x * x + y * y + z * z < 1.35 * 1.35 && y > floorAt(x, z) + 0.05) break
       }
       p.set([x, y, z], i * 3)
+      v[i * 3 + 1] = -(snow ? 0.035 : 0.055)
       rot.set([Math.random() * 6, Math.random() * 6, Math.random() * 6], i * 3)
       spin.set([(Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6], i * 3)
-      sc[i] = 0.45 + Math.pow(Math.random(), 1.6) * 0.85
+      sc[i] = 0.76 + Math.pow(Math.random(), 1.3) * 0.72
     }
-    return { p, v, rot, spin, sc, rest }
+    return { p, v, rot, spin, sc, rest, age }
   }, [count])
 
   useLayoutEffect(() => {
@@ -72,10 +74,11 @@ export function Particles({ climate, density, shake }: Props) {
     const drag = Math.exp(-(snow ? 3.1 : 2.4) * dt)
     const t = state.clock.elapsedTime
     const jit = e * 2.6
-    const { p, v, rot, spin, sc, rest } = d
+    const { p, v, rot, spin, sc, rest, age } = d
 
     for (let i = 0; i < count; i++) {
       const i3 = i * 3
+      age[i] = Math.min(1, age[i] + dt * 2.5)
       let px = p[i3]
       let py = p[i3 + 1]
       let pz = p[i3 + 2]
@@ -117,7 +120,17 @@ export function Particles({ climate, density, shake }: Props) {
         const fy = floorAt(px, pz)
         if (py < fy) {
           py = fy
-          if (e < 0.3) {
+          if (e < 0.3 && i % 3 === 0) {
+            // A fine suspended layer stays legible after the shaken flakes settle.
+            // Re-enter gently near the upper rear wall, always inside the glass.
+            px = (Math.random() - 0.5) * 1.9
+            pz = (Math.random() - 0.5) * 1.6
+            py = Math.sqrt(Math.max(0.1, RMAX * RMAX - px * px - pz * pz)) - 0.055
+            v[i3] = 0
+            v[i3 + 1] = -0.035
+            v[i3 + 2] = 0
+            age[i] = 0
+          } else if (e < 0.3) {
             rest[i] = 1
             v[i3] = 0
             v[i3 + 1] = 0
@@ -136,7 +149,7 @@ export function Particles({ climate, density, shake }: Props) {
       p[i3 + 2] = pz
       dummy.position.set(px, py, pz)
       dummy.rotation.set(rot[i3], rot[i3 + 1], rot[i3 + 2])
-      const k = sc[i]
+      const k = sc[i] * THREE.MathUtils.smoothstep(age[i], 0, 1)
       if (snow) dummy.scale.set(k, k * 0.72, k)
       else dummy.scale.setScalar(k)
       dummy.updateMatrix()

@@ -238,6 +238,8 @@ export const M = {
 
 export const flakeMaterial = new THREE.MeshPhysicalMaterial({
   color: P.porcelain,
+  emissive: P.porcelain,
+  emissiveIntensity: 0.08,
   roughness: 0.62,
   clearcoat: 0.15,
   clearcoatRoughness: 0.2,
@@ -245,7 +247,7 @@ export const flakeMaterial = new THREE.MeshPhysicalMaterial({
 
 export const glitterMaterial = new THREE.MeshStandardMaterial({
   color: P.porcelain,
-  metalness: 0.78,
+  metalness: 0.52,
   roughness: 0.3,
   flatShading: true,
   side: THREE.DoubleSide,

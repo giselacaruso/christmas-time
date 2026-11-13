@@ -1,5 +1,6 @@
 import * as THREE from "three"
 import { M } from "./materials"
+import { Garland, Gift, MarketStall, Rink, Sleigh, Wreath } from "./HolidayDecor"
 import { Ball, Block, Cyl, House, Lamp, Onion, Snowman, Tree, type V3 } from "./primitives"
 
 const Q = Math.PI / 4
@@ -74,10 +75,15 @@ export function NewYork() {
       <House p={[-0.6, 0, 0.32]} rotY={0.5} roof={M.ivory} />
       <House p={[0.62, 0, 0.32]} rotY={-0.5} roof={M.ivory} h={0.24} />
 
-      <Tree p={[0, 0, 0.42]} h={0.72} snow />
+      <Tree p={[0, 0, 0.42]} h={0.86} snow />
       <Tree p={[-0.36, 0, 0.75]} h={0.3} snow />
       <Snowman p={[0.36, 0, 0.72]} />
       <Lamp p={[-0.12, 0, 0.88]} />
+      <Rink p={[-0.65, 0, 0.68]} scale={0.74} />
+      <Gift p={[0.31, 0, 0.43]} size={0.15} />
+      <Gift p={[0.53, 0, 0.67]} size={0.11} green rot={0.3} />
+      <Wreath p={[-0.52, 0.34, -0.262]} r={0.077} />
+      <Garland p={[0.02, 0.6, -0.09]} width={0.4} drop={0.065} />
     </group>
   )
 }
@@ -129,10 +135,15 @@ export function London() {
         <Block p={[0, 0.21, 0.066]} s={[0.09, 0.16, 0.006]} round={0.002} />
       </group>
 
-      <Tree p={[-0.74, 0, -0.12]} h={0.5} snow />
+      <Tree p={[-0.74, 0, -0.12]} h={0.65} snow />
       <Tree p={[0.84, 0, 0.12]} h={0.36} snow />
       <Lamp p={[-0.26, 0, 0.6]} />
       <Lamp p={[0.78, 0, -0.2]} />
+      <Garland p={[0.3, 0.335, 0.462]} width={0.43} drop={0.05} rotY={-0.35} />
+      <Wreath p={[-0.595, 0.23, 0.483]} r={0.048} rotY={0.4} />
+      <MarketStall p={[0.67, 0, 0.68]} rot={-0.45} />
+      <Sleigh p={[-0.6, 0, 0.8]} rot={0.2} />
+      <Gift p={[-0.07, 0, 0.67]} size={0.13} green />
     </group>
   )
 }
@@ -148,12 +159,17 @@ export function Paris() {
         <Block p={[0, 0.16, 0.13]} s={[0.3, 0.018, 0.08]} r={[0.35, 0, 0]} m={M.red} />
         <Cyl p={[0.06, 0.04, 0.22]} rt={0.035} rb={0.035} h={0.01} m={M.ivory} />
         <Cyl p={[0.06, 0.02, 0.22]} rt={0.005} rb={0.005} h={0.04} m={M.gold} />
+        <Wreath p={[0, 0.21, 0.112]} r={0.047} />
       </group>
-      <Tree p={[0.34, 0, 0.62]} h={0.36} snow />
-      <Tree p={[-0.3, 0, 0.62]} h={0.44} snow />
+      <Tree p={[0.34, 0, 0.62]} h={0.5} snow />
+      <Tree p={[-0.3, 0, 0.62]} h={0.56} snow />
       <Lamp p={[0.04, 0, 0.64]} />
       <Lamp p={[0.6, 0, -0.5]} />
       <Snowman p={[0.82, 0, -0.22]} />
+      <MarketStall p={[-0.73, 0, 0.64]} rot={0.45} snow />
+      <Gift p={[0.6, 0, 0.75]} size={0.15} />
+      <Gift p={[0.76, 0, 0.64]} size={0.105} green rot={-0.2} />
+      <Garland p={[-0.64, 0.265, 0.27]} width={0.25} drop={0.04} rotY={0.55} />
     </group>
   )
 }
@@ -185,12 +201,16 @@ export function Moscow() {
       <Ball p={[-0.3, 0.6, -0.02]} r={0.07} s={[1.25, 0.35, 1.25]} m={M.ivory} />
       <Ball p={[0.28, 0.73, -0.38]} r={0.06} s={[1.25, 0.35, 1.25]} m={M.ivory} />
 
-      <Tree p={[-0.7, 0, 0.34]} h={0.5} snow />
-      <Tree p={[0.7, 0, 0.34]} h={0.45} snow />
+      <Tree p={[-0.7, 0, 0.34]} h={0.65} snow />
+      <Tree p={[0.7, 0, 0.34]} h={0.6} snow />
       <Tree p={[-0.8, 0, -0.34]} h={0.4} snow />
       <Tree p={[0.8, 0, -0.3]} h={0.38} snow />
       <Snowman p={[0.3, 0, 0.62]} />
       <Lamp p={[-0.3, 0, 0.62]} />
+      <Sleigh p={[0, 0, 0.8]} rot={-0.2} />
+      <MarketStall p={[-0.71, 0, 0.74]} rot={0.35} snow />
+      <Wreath p={[0, 0.15, 0.145]} r={0.075} />
+      <Gift p={[0.64, 0, 0.73]} size={0.15} green />
     </group>
   )
 }

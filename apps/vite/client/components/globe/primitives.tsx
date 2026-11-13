@@ -79,6 +79,36 @@ const TREE_PROFILE = [
   [0.176, 0.65], [0.135, 0.73], [0.05, 0.875], [0, 0.965],
 ]
 
+export function ChristmasStar({ p, r = 0.06 }: { p: V3; r?: number }) {
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape()
+    for (let i = 0; i < 10; i++) {
+      const a = Math.PI / 2 + i * Math.PI / 5
+      const radius = r * (i % 2 ? 0.44 : 1)
+      const x = Math.cos(a) * radius
+      const y = Math.sin(a) * radius
+      if (i === 0) shape.moveTo(x, y)
+      else shape.lineTo(x, y)
+    }
+    shape.closePath()
+    return new THREE.ExtrudeGeometry(shape, { depth: r * 0.2, bevelEnabled: true, bevelThickness: r * 0.07, bevelSize: r * 0.07, bevelSegments: 3, steps: 1 })
+  }, [r])
+  useEffect(() => () => geometry.dispose(), [geometry])
+  return <mesh position={p} geometry={geometry} material={M.gold} castShadow receiveShadow />
+}
+
+function treeRadius(y: number) {
+  let radius = 0
+  for (let i = 1; i < TREE_PROFILE.length; i++) {
+    const [a, ya] = TREE_PROFILE[i - 1]
+    const [b, yb] = TREE_PROFILE[i]
+    if (y >= Math.min(ya, yb) && y <= Math.max(ya, yb) && ya !== yb) {
+      radius = Math.max(radius, THREE.MathUtils.lerp(a, b, (y - ya) / (yb - ya)))
+    }
+  }
+  return radius
+}
+
 export function Tree({ p, h = 0.6, snow = false }: { p: V3; h?: number; snow?: boolean }) {
   const geometry = useMemo(() => {
     const curve = new THREE.CatmullRomCurve3(
@@ -87,7 +117,17 @@ export function Tree({ p, h = 0.6, snow = false }: { p: V3; h?: number; snow?: b
     )
     return new THREE.LatheGeometry(curve.getPoints(160).map((v) => new THREE.Vector2(Math.max(0, v.x), v.y)), 64)
   }, [h])
-  useEffect(() => () => geometry.dispose(), [geometry])
+  const ribbon = useMemo(() => {
+    const points = Array.from({ length: 180 }, (_, i) => {
+      const t = i / 179
+      const y = 0.19 + t * 0.67
+      const a = t * Math.PI * 7
+      const r = h * (treeRadius(y) + 0.009)
+      return new THREE.Vector3(Math.sin(a) * r, y * h, Math.cos(a) * r)
+    })
+    return new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points), 180, h * 0.007, 5, false)
+  }, [h])
+  useEffect(() => () => { geometry.dispose(); ribbon.dispose() }, [geometry, ribbon])
   const baubles = [
     [0, 0.2],
     [2.1, 0.2],
@@ -101,6 +141,7 @@ export function Tree({ p, h = 0.6, snow = false }: { p: V3; h?: number; snow?: b
     <group position={p}>
       <Cyl p={[0, h * 0.08, 0]} rt={h * 0.05} rb={h * 0.065} h={h * 0.16} m={M.goldSoft} />
       <mesh geometry={geometry} material={M.green} castShadow receiveShadow />
+      <mesh geometry={ribbon} material={M.goldSoft} />
       {snow && <>
         <Ball p={[-h * 0.16, h * 0.29, h * 0.14]} r={h * 0.08} s={[1.5, 0.32, 0.8]} rot={[0.3, 0.4, -0.6]} m={M.snow} />
         <Ball p={[h * 0.12, h * 0.51, h * 0.1]} r={h * 0.065} s={[1.4, 0.32, 0.8]} rot={[0.3, -0.4, 0.6]} m={M.snow} />
@@ -108,12 +149,10 @@ export function Tree({ p, h = 0.6, snow = false }: { p: V3; h?: number; snow?: b
       </>}
       {baubles.map(([a, t], i) => {
         const y = h * (0.18 + t * 0.85)
-        const rad = h * 0.36 * (1 - t * 0.78) * 0.82
+        const rad = h * (treeRadius(y / h) + 0.018)
         return <Ball key={i} p={[Math.sin(a) * rad, y, Math.cos(a) * rad]} r={h * 0.035} m={i % 3 === 0 ? M.gold : M.red} />
       })}
-      <mesh position={[0, h * 0.97, 0]} material={M.gold} castShadow>
-        <octahedronGeometry args={[h * 0.07, 0]} />
-      </mesh>
+      <ChristmasStar p={[0, h * 0.99, 0]} r={h * 0.085} />
     </group>
   )
 }

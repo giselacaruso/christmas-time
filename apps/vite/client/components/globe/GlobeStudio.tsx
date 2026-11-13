@@ -7,6 +7,8 @@ import { R_GLASS } from "./shake"
 const GLASS_SEAT = -1.06
 const glassEnd = Math.acos(GLASS_SEAT / R_GLASS)
 const neckRadius = Math.sqrt(R_GLASS * R_GLASS - GLASS_SEAT * GLASS_SEAT)
+// Optically clear glass, not a second layer of the cream ceramic glaze.
+const clearGlass = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0.96)
 
 export function GlobeGlass() {
   return (
@@ -16,25 +18,23 @@ export function GlobeGlass() {
       <mesh renderOrder={10}>
         <sphereGeometry args={[R_GLASS, 160, 112, 0, Math.PI * 2, 0, glassEnd]} />
         <meshPhysicalMaterial
-          color={P.porcelain}
+          color={clearGlass}
           transmission={1}
-          thickness={0.055}
-          roughness={0.016}
-          ior={1.46}
+          thickness={0.018}
+          roughness={0.008}
+          ior={1.34}
           metalness={0}
-          clearcoat={0.12}
-          clearcoatRoughness={0.045}
-          envMapIntensity={1.15}
-          specularIntensity={1}
+          clearcoat={0}
+          envMapIntensity={0.48}
+          specularIntensity={0.58}
           depthWrite={false}
-          attenuationColor={P.porcelain}
-          attenuationDistance={12}
+          attenuationDistance={Infinity}
         />
       </mesh>
       {/* The tiny rolled glass lip gives the shell actual thickness at its seat. */}
       <mesh position={[0, GLASS_SEAT + 0.012, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={11}>
         <torusGeometry args={[neckRadius, 0.012, 12, 144]} />
-        <meshPhysicalMaterial color={P.porcelain} transmission={1} thickness={0.025} roughness={0.04} ior={1.46} depthWrite={false} />
+        <meshPhysicalMaterial color={clearGlass} transmission={1} thickness={0.012} roughness={0.018} ior={1.34} envMapIntensity={0.48} specularIntensity={0.58} depthWrite={false} />
       </mesh>
     </group>
   )
