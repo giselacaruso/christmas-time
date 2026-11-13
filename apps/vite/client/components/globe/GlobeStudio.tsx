@@ -13,11 +13,14 @@ const clearGlass = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0
 const studioGround = new THREE.Color(P.porcelain).lerp(new THREE.Color(P.shadow), 0.3)
 
 export function GlobeGlass() {
+  const pixelRatio = useThree((state) => state.viewport.dpr)
   const edge = useMemo(() => new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
     uniforms: {
-      uColor: { value: new THREE.Color(P.shadow).lerp(new THREE.Color(P.gold), 0.25) },
+      uColor: { value: new THREE.Color(P.shadow).lerp(new THREE.Color(P.porcelain), 0.3) },
+      uHighlight: { value: clearGlass.clone() },
+      uPixelRatio: { value: pixelRatio },
     },
     vertexShader: `
       varying vec3 vGlassNormal;
@@ -31,18 +34,37 @@ export function GlobeGlass() {
     `,
     fragmentShader: `
       uniform vec3 uColor;
+      uniform vec3 uHighlight;
+      uniform float uPixelRatio;
       varying vec3 vGlassNormal;
       varying vec3 vGlassView;
       void main() {
-        float facing = abs(dot(normalize(vGlassNormal), normalize(vGlassView)));
-        // Only the extreme tangent gets a hairline, not a dark shaded band.
-        float rim = 1.0 - smoothstep(0.015, 0.105, facing);
-        gl_FragColor = vec4(uColor, rim * 0.28);
+        vec3 normal = normalize(vGlassNormal);
+        float facing = abs(dot(normal, normalize(vGlassView)));
+        // Facing squared is approximately linear in distance from a sphere's
+        // silhouette. Its derivative keeps the contour below one CSS pixel,
+        // instead of turning a fixed Fresnel threshold into a thick dark rim
+        // when the canvas grows. Smooth coverage also avoids a jagged stroke.
+        float tangentDistance = facing * facing;
+        float edgePixels = tangentDistance / max(fwidth(tangentDistance), 0.00001);
+        float hairline = 1.0 - smoothstep(0.12, 0.85, edgePixels / uPixelRatio);
+
+        // The upper-left softbox breaks up the outline with a pale glint;
+        // the opposite side carries a slightly stronger, warm reflection.
+        // A very faint, wider falloff suggests glass thickness without
+        // tinting the clear centre or forming a uniform shaded border.
+        float litSide = smoothstep(-0.7, 0.85, dot(normal.xy, normalize(vec2(-0.7, 0.75))));
+        float grazing = pow(1.0 - facing, 7.0);
+        float shade = grazing * (1.0 - litSide) * 0.045;
+        float opacity = hairline * mix(0.46, 0.23, litSide) + shade;
+        vec3 reflection = mix(uColor, uHighlight, litSide * 0.42);
+        gl_FragColor = vec4(reflection, opacity);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
   }), [])
+  edge.uniforms.uPixelRatio.value = pixelRatio
   useEffect(() => () => edge.dispose(), [edge])
 
   return (
@@ -54,12 +76,12 @@ export function GlobeGlass() {
         <meshPhysicalMaterial
           color={clearGlass}
           transmission={1}
-          thickness={0.026}
-          roughness={0.012}
+          thickness={0.02}
+          roughness={0.022}
           ior={1.46}
           metalness={0}
           clearcoat={0}
-          envMapIntensity={1.05}
+          envMapIntensity={0.98}
           specularIntensity={1}
           depthWrite={false}
           attenuationDistance={Infinity}

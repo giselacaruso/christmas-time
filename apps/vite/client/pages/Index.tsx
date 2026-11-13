@@ -31,7 +31,7 @@ export default function Index() {
           <p className="type-display whitespace-nowrap text-heading not-italic leading-none text-foreground lg:text-display" data-oid="839eb34112">{city.temp}</p>
           <div className="flex min-w-0 flex-col items-start gap-ds-xs" data-oid="c8f4d5950a">
             <h2 className="type-label uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
-            <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:7900235236ac|expression:06ffb3af518d">
+            <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:33651009acf3|expression:06ffb3af518d">
               {city.climate === "snow" ? (
                 <Snowflake aria-label="Invierno" className="size-4 shrink-0" strokeWidth={1.2} data-oid="3fabbe106b" />
               ) : (
