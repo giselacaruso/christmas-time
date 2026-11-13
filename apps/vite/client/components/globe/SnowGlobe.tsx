@@ -283,15 +283,14 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
         shadows
         dpr={[1, 2]}
         camera={{ position: [0, 0.2, 8.2], fov: 30 }}
-        gl={{ antialias: true }}
+        gl={{ antialias: true, alpha: true }}
         onCreated={({ gl }) => {
-          gl.setClearColor(P.porcelain, 1)
+          gl.setClearColor(P.porcelain, 0)
           gl.shadowMap.type = THREE.PCFSoftShadowMap
           gl.toneMapping = THREE.ACESFilmicToneMapping
           gl.toneMappingExposure = 0.95
         }}
       >
-        <color attach="background" args={[P.porcelain]} />
         <StudioLights />
         <GlobeRig shake={shake}>
           <Base />

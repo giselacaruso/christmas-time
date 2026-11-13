@@ -1,0 +1,38 @@
+.christmas-editorial {
+  /* This proposal uses a neutral gallery ground; ceramic materials keep the
+     original cream, red, fir and gold design-system colors in the 3D scene. */
+  color-scheme: light;
+  --background: var(--color-white, Canvas);
+  --foreground: var(--color-black, CanvasText);
+  --muted-foreground: color-mix(in srgb, var(--foreground) 54%, var(--background));
+  --border: color-mix(in srgb, var(--foreground) 14%, var(--background));
+}
+
+.christmas-editorial .city-name {
+  background-image: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--accent) 70%, var(--accent-foreground)) 0%,
+    var(--accent) 24%,
+    var(--primary-foreground) 39%,
+    var(--accent) 48%,
+    color-mix(in srgb, var(--accent) 65%, var(--accent-foreground)) 65%,
+    var(--accent) 82%,
+    var(--primary-foreground) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 100% center;
+  background-clip: text;
+  -webkit-background-clip: text;
+  transition: color 180ms ease, background-position 600ms ease;
+}
+
+.christmas-editorial .city-name:is(:hover, :focus-visible, [aria-pressed="true"]) {
+  color: transparent;
+  background-position: 0% center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .christmas-editorial .city-name {
+    transition: none;
+  }
+}

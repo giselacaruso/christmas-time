@@ -4,6 +4,7 @@ export type Ground = "snow" | "grass" | "sand"
 export interface City {
   id: string
   name: string
+  listClassName?: string
   country: string
   temp: string
   weather: string
@@ -18,6 +19,7 @@ export const CITIES: City[] = [
   {
     id: "nueva-york",
     name: "Nueva York",
+    listClassName: "not-italic",
     country: "Estados Unidos",
     temp: "−2 °C",
     weather: "Nevada en Manhattan",
@@ -31,6 +33,7 @@ export const CITIES: City[] = [
   {
     id: "londres",
     name: "Londres",
+    listClassName: "italic",
     country: "Reino Unido",
     temp: "4 °C",
     weather: "Escarcha y llovizna fría",
@@ -44,6 +47,7 @@ export const CITIES: City[] = [
   {
     id: "paris",
     name: "París",
+    listClassName: "not-italic",
     country: "Francia",
     temp: "3 °C",
     weather: "Nieve ligera sobre el Sena",
@@ -57,6 +61,7 @@ export const CITIES: City[] = [
   {
     id: "tokio",
     name: "Tokio",
+    listClassName: "italic",
     country: "Japón",
     temp: "9 °C",
     weather: "Cielo seco e iluminaciones",
@@ -70,6 +75,7 @@ export const CITIES: City[] = [
   {
     id: "buenos-aires",
     name: "Buenos Aires",
+    listClassName: "not-italic",
     country: "Argentina",
     temp: "31 °C",
     weather: "Sol pleno de verano",
@@ -78,11 +84,12 @@ export const CITIES: City[] = [
     ground: "grass",
     density: 1,
     blurb:
-      "Navidad en pleno verano: el Obelisco bajo un sol dorado, palmeras sobre la 9 de Julio y brindis al aire libre.",
+      "Navidad en pleno verano: el Obelisco bajo un sol dorado, árboles urbanos y edificios sobre la 9 de Julio, y brindis al aire libre.",
   },
   {
     id: "roma",
     name: "Roma",
+    listClassName: "italic",
     country: "Italia",
     temp: "12 °C",
     weather: "Sol tibio de invierno",
@@ -96,6 +103,7 @@ export const CITIES: City[] = [
   {
     id: "sidney",
     name: "Sídney",
+    listClassName: "not-italic",
     country: "Australia",
     temp: "26 °C",
     weather: "Verano junto a la bahía",
@@ -109,6 +117,7 @@ export const CITIES: City[] = [
   {
     id: "moscu",
     name: "Moscú",
+    listClassName: "italic",
     country: "Rusia",
     temp: "−9 °C",
     weather: "Nevada intensa",
@@ -122,6 +131,7 @@ export const CITIES: City[] = [
   {
     id: "dubai",
     name: "Dubái",
+    listClassName: "not-italic",
     country: "Emiratos Árabes",
     temp: "24 °C",
     weather: "Desierto despejado",
@@ -135,6 +145,7 @@ export const CITIES: City[] = [
   {
     id: "rio",
     name: "Río de Janeiro",
+    listClassName: "italic",
     country: "Brasil",
     temp: "30 °C",
     weather: "Calor tropical",
@@ -148,6 +159,7 @@ export const CITIES: City[] = [
   {
     id: "san-francisco",
     name: "San Francisco",
+    listClassName: "not-italic",
     country: "Estados Unidos",
     temp: "12 °C",
     weather: "Niebla fresca en la bahía",
@@ -161,6 +173,7 @@ export const CITIES: City[] = [
   {
     id: "cancun",
     name: "Cancún",
+    listClassName: "italic",
     country: "México",
     temp: "28 °C",
     weather: "Sol caribeño",
@@ -174,6 +187,7 @@ export const CITIES: City[] = [
   {
     id: "toronto",
     name: "Toronto",
+    listClassName: "not-italic",
     country: "Canadá",
     temp: "−5 °C",
     weather: "Nieve sobre el lago",
@@ -187,6 +201,7 @@ export const CITIES: City[] = [
   {
     id: "bangkok",
     name: "Tailandia",
+    listClassName: "italic",
     country: "Bangkok",
     temp: "32 °C",
     weather: "Calor húmedo y cielo claro",
@@ -200,6 +215,7 @@ export const CITIES: City[] = [
   {
     id: "viena",
     name: "Viena",
+    listClassName: "not-italic",
     country: "Austria",
     temp: "−1 °C",
     weather: "Nevada sobre los mercados",
