@@ -135,13 +135,43 @@ function Stage({ city, shake }: { city: City; shake: MutableRefObject<ShakeState
   const anim = useRef<{ t: number; phase: "swap" | "in" | "out" | "idle" }>({ t: 0, phase: "swap" })
   const parts = useRef<Part[]>([])
   const group = useRef<THREE.Group>(null)
+  const localFloor = useMemo(() => new THREE.Plane(new THREE.Vector3(0, 1, 0), -(GROUND_Y - 0.01)), [])
+  const worldFloor = useMemo(() => localFloor.clone(), [localFloor])
 
   // Collect the new city's pieces and tuck each one under the ground, right where it stands.
   useLayoutEffect(() => {
-    parts.current = group.current ? collectParts(group.current) : []
+    const root = group.current
+    root?.updateWorldMatrix(true, true)
+    parts.current = root ? collectParts(root) : []
+    // Clip only city meshes, never the base or its shared glaze materials.
+    // This floor follows the globe while dragging, hiding descending pieces
+    // before they can poke out below the ceramic plinth.
+    const materials = new Map<THREE.Material, THREE.Material>()
+    const originals: { mesh: THREE.Mesh; material: THREE.Material | THREE.Material[] }[] = []
+    const clipped = (source: THREE.Material) => {
+      let material = materials.get(source)
+      if (!material) {
+        material = source.clone()
+        material.clippingPlanes = [worldFloor]
+        material.clipShadows = true
+        materials.set(source, material)
+      }
+      return material
+    }
+    root?.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return
+      originals.push({ mesh: object, material: object.material })
+      object.material = Array.isArray(object.material)
+        ? object.material.map(clipped)
+        : clipped(object.material)
+    })
     for (const p of parts.current) p.obj.position.y = p.baseY - p.depth
     anim.current = { t: 0, phase: "in" }
-  }, [shown.id])
+    return () => {
+      for (const { mesh, material } of originals) mesh.material = material
+      for (const material of materials.values()) material.dispose()
+    }
+  }, [shown.id, worldFloor])
 
   useEffect(() => {
     if (city.id === shown.id && anim.current.phase !== "out") return
@@ -151,6 +181,11 @@ function Stage({ city, shake }: { city: City; shake: MutableRefObject<ShakeState
   }, [city.id, shown.id])
 
   useFrame((_, raw) => {
+    const rig = group.current?.parent
+    if (rig) {
+      rig.updateWorldMatrix(true, false)
+      worldFloor.copy(localFloor).applyMatrix4(rig.matrixWorld)
+    }
     const dt = Math.min(raw, 1 / 30)
     const a = anim.current
     if (a.phase === "idle" || a.phase === "swap") return
@@ -205,23 +240,26 @@ function GlobeRig({ shake, children }: { shake: MutableRefObject<ShakeState>; ch
     const dt = Math.min(raw, 1 / 30)
     const s = shake.current
     const k = st.current
-    const tx = s.dragging ? s.offX * 0.34 : 0
-    const ty = s.dragging ? s.offY * 0.24 : 0
+    const tx = s.dragging ? s.offX * 0.22 : 0
+    const ty = s.dragging ? s.offY * 0.12 : 0
     const ax = (tx - k.px) * 80 - k.vx * 7
     const ay = (ty - k.py) * 80 - k.vy * 7
     k.vx += ax * dt
     k.vy += ay * dt
     k.px += k.vx * dt
     k.py += k.vy * dt
+    k.px = THREE.MathUtils.clamp(k.px, -0.26, 0.26)
+    k.py = THREE.MathUtils.clamp(k.py, -0.16, 0.16)
     s.accel.set(THREE.MathUtils.clamp(ax, -40, 40), THREE.MathUtils.clamp(ay, -40, 40), 0)
     s.energy = Math.min(4, s.energy * Math.exp(-dt * 0.85) + Math.hypot(ax, ay) * dt * 0.01)
     k.ry = THREE.MathUtils.lerp(k.ry, s.spin, 1 - Math.exp(-dt * 6))
     const t = state.clock.elapsedTime
     if (ref.current) {
       ref.current.position.set(k.px, 0.15 + k.py, 0)
-      ref.current.rotation.set(-k.py * 0.35, k.ry + Math.sin(t * 0.2) * 0.18, -k.px * 0.4)
+      ref.current.rotation.set(-k.py * 0.28, k.ry + Math.sin(t * 0.2) * 0.18, -k.px * 0.32)
+      ref.current.updateWorldMatrix(true, true)
     }
-  })
+  }, -1)
 
   return <group ref={ref}>{children}</group>
 }
@@ -282,13 +320,16 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: [0, 0.2, 8.2], fov: 30 }}
+        camera={{ position: [0, 0, 9.2], fov: 32 }}
         gl={{ antialias: true, alpha: true }}
         onCreated={({ gl }) => {
           gl.setClearColor(P.porcelain, 0)
           gl.shadowMap.type = THREE.PCFSoftShadowMap
-          gl.toneMapping = THREE.ACESFilmicToneMapping
-          gl.toneMappingExposure = 0.95
+          gl.localClippingEnabled = true
+          // Product-photography tone mapping preserves red/green pigment
+          // instead of bleaching saturated glaze under studio reflections.
+          gl.toneMapping = THREE.NeutralToneMapping
+          gl.toneMappingExposure = 1
         }}
       >
         <StudioLights />

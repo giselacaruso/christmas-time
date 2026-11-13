@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { Snowflake, Sun } from "lucide-react";
+import { MoveUpRight, Snowflake, Sparkles, Sun } from "lucide-react";
 import { CitySlider } from "../components/CitySlider";
 import { GlobePanel } from "../components/GlobePanel";
 import { CITIES } from "../data/cities";
@@ -12,38 +12,52 @@ export default function Index() {
   const city = CITIES[index];
 
   return (
-    <main className="christmas-editorial relative flex min-h-screen flex-col bg-card px-ds-lg py-ds-lg text-foreground md:px-ds-xl md:py-ds-xl 2xl:px-ds-2xl" data-oid="033b6f01be" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true">
-      
+    <main className="christmas-editorial relative grid h-dvh min-h-screen grid-rows-[minmax(0,1fr)_auto_auto] gap-y-ds-lg overflow-clip bg-card px-ds-lg py-ds-lg text-foreground md:px-ds-xl md:py-ds-xl 2xl:px-ds-2xl" data-oid="a258d16a5f" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true">
+      <div aria-hidden="true" className="globe-backdrop pointer-events-none absolute inset-0" data-oid="3cdebcab9a" />
 
-
-
-
-
-
-
-
-      
-
-      <div className="grid flex-1 items-center gap-x-ds-2xl lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]" data-oid="fd810209d4">
+      <div className="relative z-10 grid min-h-0 grid-rows-[auto_minmax(0,1fr)] items-center gap-x-ds-2xl lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:grid-rows-1" data-oid="59337d435b">
         <CitySlider cities={CITIES} index={index} onSelect={selectCity} />
-        <GlobePanel city={city} shakeKey={shakeKey} onShake={() => setShakeKey((key) => key + 1)} />
+        <GlobePanel city={city} shakeKey={shakeKey} />
       </div>
 
-      <footer className="mt-ds-xl flex flex-col items-start gap-ds-xl" data-oid="f329b349b9">
-        <section id="selected-city-info" aria-label="Información del destino seleccionado" aria-live="polite" aria-atomic="true" className="flex flex-col items-start gap-ds-sm text-left" data-oid="7f92051768">
-          <div className="flex flex-wrap items-baseline gap-x-ds-lg gap-y-ds-sm" data-oid="81ab669d79">
-            <h2 className="type-label uppercase text-foreground" data-oid="8aa460861c">{city.country}</h2>
-            <p className="flex items-center gap-ds-sm type-body text-foreground" data-oid="9e70bcaee2" data-oid-text-editable="false" data-oid-text-source="expression:2c93c8ef1f58|expression:b48ae97fa8b1">
-              {city.climate === "snow" ? <Snowflake aria-label="Invierno" className="size-4" strokeWidth={1.2} data-oid="e360b2b422" /> : <Sun aria-label="Clima cálido" className="size-4" strokeWidth={1.2} data-oid="b4a871ad4c" />}
-              {city.temp}
+      <footer className="relative z-10 grid items-center gap-x-ds-2xl gap-y-ds-md lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]" data-oid="e1b574fd8b">
+        <section
+          id="selected-city-info"
+          aria-label="Información del destino seleccionado"
+          aria-live="polite"
+          aria-atomic="true"
+          className="flex items-center gap-ds-lg text-left" data-oid="3f268a948a"
+        >
+          <p className="type-display whitespace-nowrap text-heading not-italic leading-none text-foreground lg:text-display" data-oid="839eb34112">{city.temp}</p>
+          <div className="flex min-w-0 flex-col items-start gap-ds-xs" data-oid="c8f4d5950a">
+            <h2 className="type-label uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
+            <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:7900235236ac|expression:06ffb3af518d">
+              {city.climate === "snow" ? (
+                <Snowflake aria-label="Invierno" className="size-4 shrink-0" strokeWidth={1.2} data-oid="3fabbe106b" />
+              ) : (
+                <Sun aria-label="Clima cálido" className="size-4 shrink-0" strokeWidth={1.2} data-oid="da82436992" />
+              )}
+              {city.weather}
             </p>
+            <p className="type-caption text-muted-foreground" data-oid="cb6fce8725">{city.coords}</p>
           </div>
-          <p className="type-caption text-muted-foreground" data-oid="6b574add4d">{city.weather}</p>
-          <p className="type-caption text-muted-foreground" data-oid="f5a4a3dce2">{city.coords}</p>
         </section>
-        <p className="type-caption text-muted-foreground" data-oid="3b731a21a4">{"giselacaruso.com"}</p>
-        
-      </footer>
-    </main>);
 
+        <div className="flex flex-col items-start gap-ds-xs lg:items-center" data-oid="3720033362">
+          <button
+            type="button"
+            onClick={() => setShakeKey((key) => key + 1)}
+            className="ds-button ds-button-secondary gap-ds-sm rounded-none border-0 bg-transparent px-ds-sm py-ds-sm type-label uppercase text-foreground hover:translate-y-0 hover:bg-transparent hover:text-accent" data-oid="b414e74131"
+          >
+            <Sparkles aria-hidden="true" className="size-4" strokeWidth={1.2} data-oid="d18e41896e" />
+            Agitar la esfera
+            <MoveUpRight aria-hidden="true" className="size-3" strokeWidth={1.2} data-oid="041e06d842" />
+          </button>
+          <p className="type-caption text-muted-foreground" data-oid="e9ecf64720">O arrástrala suavemente</p>
+        </div>
+      </footer>
+
+      <p className="relative z-10 type-caption text-muted-foreground" data-oid="966e7aa028">giselacaruso.com</p>
+    </main>
+  );
 }

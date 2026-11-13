@@ -2,6 +2,23 @@
   color-scheme: light;
 }
 
+.christmas-editorial .globe-backdrop {
+  background: radial-gradient(
+    ellipse at 110% 44%,
+    color-mix(in srgb, var(--border) 70%, var(--card)) 0%,
+    color-mix(in srgb, var(--border) 30%, var(--card)) 32%,
+    transparent 67%
+  );
+}
+
+.christmas-editorial .globe-panel {
+  container-type: size;
+}
+
+.christmas-editorial .globe-frame {
+  width: min(100cqw, 100cqh);
+}
+
 .christmas-editorial .city-list {
   text-wrap: balance;
 }
@@ -13,6 +30,9 @@
 }
 
 .christmas-editorial .city-name {
+  /* Padding on the button keeps the gold behind glyph descenders even
+     though the display token has a deliberately tight line box. */
+  background-origin: border-box;
   background-image: linear-gradient(
     115deg,
     color-mix(in srgb, var(--accent) 70%, var(--accent-foreground)) 0%,

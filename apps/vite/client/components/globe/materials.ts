@@ -174,7 +174,7 @@ interface CeramicOpts {
   side?: THREE.Side
 }
 
-function ceramic(color: string, { speckled = true, roughness = 0.34, side = THREE.FrontSide }: CeramicOpts = {}) {
+function ceramic(color: string, { speckled = true, roughness = 0.28, side = THREE.FrontSide }: CeramicOpts = {}) {
   const repeat = 1.4 + rnd() * 0.8
   const normal = variant(NORMAL, false, repeat)
   return new THREE.MeshPhysicalMaterial({
@@ -183,24 +183,24 @@ function ceramic(color: string, { speckled = true, roughness = 0.34, side = THRE
     roughness,
     roughnessMap: variant(ROUGH, false, repeat),
     normalMap: normal,
-    normalScale: new THREE.Vector2(0.12, 0.12),
+    normalScale: new THREE.Vector2(0.075, 0.075),
     metalness: 0,
     // A continuous, smooth glaze over slightly irregular fired clay. Broad
     // studio sources soften the highlight without making the glaze look matte.
     ior: 1.5,
     clearcoat: 1,
-    clearcoatRoughness: 0.095,
+    clearcoatRoughness: 0.065,
     clearcoatNormalMap: normal,
-    clearcoatNormalScale: new THREE.Vector2(0.045, 0.045),
+    clearcoatNormalScale: new THREE.Vector2(0.025, 0.025),
     specularIntensity: 1,
     specularColor: new THREE.Color(P.porcelain),
     sheen: 0,
-    envMapIntensity: 1.05,
+    envMapIntensity: 1.25,
     side,
   })
 }
 
-function lustre(color: string, roughness = 0.27) {
+function lustre(color: string, roughness = 0.22) {
   const repeat = 1.6 + rnd() * 0.6
   return new THREE.MeshPhysicalMaterial({
     color,
@@ -209,9 +209,9 @@ function lustre(color: string, roughness = 0.27) {
     roughnessMap: variant(ROUGH, false, repeat),
     normalMap: variant(NORMAL, false, repeat),
     normalScale: new THREE.Vector2(0.07, 0.07),
-    clearcoat: 0.45,
-    clearcoatRoughness: 0.12,
-    envMapIntensity: 1.1,
+    clearcoat: 0.65,
+    clearcoatRoughness: 0.085,
+    envMapIntensity: 1.35,
   })
 }
 
@@ -227,9 +227,9 @@ export const M = {
     clearcoat: 0.08,
     envMapIntensity: 0.65,
   }),
-  red: ceramic(P.red, { speckled: false, roughness: 0.29 }),
+  red: ceramic(P.red, { speckled: false, roughness: 0.24 }),
   redDeep: ceramic(P.redDeep, { speckled: false, roughness: 0.32 }),
-  green: ceramic(P.fir, { speckled: false, roughness: 0.29 }),
+  green: ceramic(P.fir, { speckled: false, roughness: 0.24 }),
   greenDeep: ceramic(P.firDeep, { speckled: false, roughness: 0.32 }),
   sand: ceramic(P.sand, { roughness: 0.55 }),
   gold: lustre(P.gold),

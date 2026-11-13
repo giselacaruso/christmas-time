@@ -10,9 +10,41 @@ const glassEnd = Math.acos(GLASS_SEAT / R_GLASS)
 const neckRadius = Math.sqrt(R_GLASS * R_GLASS - GLASS_SEAT * GLASS_SEAT)
 // Optically clear glass, not a second layer of the cream ceramic glaze.
 const clearGlass = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0.96)
-const studioGround = new THREE.Color(P.porcelain).lerp(new THREE.Color(P.shadow), 0.14)
+const studioGround = new THREE.Color(P.porcelain).lerp(new THREE.Color(P.shadow), 0.3)
 
 export function GlobeGlass() {
+  const edge = useMemo(() => new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    uniforms: {
+      uColor: { value: new THREE.Color(P.shadow).lerp(new THREE.Color(P.gold), 0.25) },
+    },
+    vertexShader: `
+      varying vec3 vGlassNormal;
+      varying vec3 vGlassView;
+      void main() {
+        vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+        vGlassNormal = normalize(normalMatrix * normal);
+        vGlassView = -viewPosition.xyz;
+        gl_Position = projectionMatrix * viewPosition;
+      }
+    `,
+    fragmentShader: `
+      uniform vec3 uColor;
+      varying vec3 vGlassNormal;
+      varying vec3 vGlassView;
+      void main() {
+        float facing = abs(dot(normalize(vGlassNormal), normalize(vGlassView)));
+        // Only the extreme tangent gets a hairline, not a dark shaded band.
+        float rim = 1.0 - smoothstep(0.015, 0.105, facing);
+        gl_FragColor = vec4(uColor, rim * 0.28);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }
+    `,
+  }), [])
+  useEffect(() => () => edge.dispose(), [edge])
+
   return (
     <group>
       {/* An open-bottom shell, not a complete sphere intersecting the plinth.
@@ -23,15 +55,18 @@ export function GlobeGlass() {
           color={clearGlass}
           transmission={1}
           thickness={0.026}
-          roughness={0.018}
+          roughness={0.012}
           ior={1.46}
           metalness={0}
           clearcoat={0}
-          envMapIntensity={0.82}
-          specularIntensity={0.9}
+          envMapIntensity={1.05}
+          specularIntensity={1}
           depthWrite={false}
           attenuationDistance={Infinity}
         />
+      </mesh>
+      <mesh material={edge} renderOrder={12}>
+        <sphereGeometry args={[R_GLASS + 0.001, 160, 112, 0, Math.PI * 2, 0, glassEnd]} />
       </mesh>
       {/* The tiny rolled glass lip gives the shell actual thickness at its seat. */}
       <mesh position={[0, GLASS_SEAT + 0.012, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={11}>
@@ -45,10 +80,10 @@ export function GlobeGlass() {
 export function StudioLights() {
   return (
     <>
-      <hemisphereLight args={[P.porcelain, P.shadow, 0.26]} />
+      <hemisphereLight args={[P.porcelain, P.shadow, 0.18]} />
       <directionalLight
         position={[-3.8, 6, 5]}
-        intensity={2.5}
+        intensity={2.3}
         color={P.porcelain}
         castShadow
         shadow-mapSize={[4096, 4096]}
@@ -66,8 +101,8 @@ export function StudioLights() {
           the glass and broad, smooth highlights on the ceramic glaze. */}
       <Environment resolution={512} frames={1}>
         <color attach="background" args={[studioGround]} />
-        <Lightformer form="rect" intensity={4.5} color={P.porcelain} position={[-4.5, 3.2, 4]} scale={[3, 4.5, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
-        <Lightformer form="rect" intensity={3.2} color={P.porcelain} position={[5, 1, 2]} scale={[0.8, 5, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
+        <Lightformer form="rect" intensity={4} color={P.porcelain} position={[-3.5, 4, 5]} scale={[2, 3, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
+        <Lightformer form="rect" intensity={4} color={P.porcelain} position={[5, 1, 3]} scale={[1, 4, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
         <Lightformer form="rect" intensity={1.8} color={P.porcelain} position={[0, 6, 0]} scale={[5, 3, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
         <Lightformer form="rect" intensity={1.1} color={P.fill} position={[-2, 2, -4]} scale={[3, 4, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
         {/* Narrow studio flags make separate curved dark reflections, not a
