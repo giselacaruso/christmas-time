@@ -1,8 +1,8 @@
 import * as THREE from "three"
 import { Tower } from "./ColdCities"
 import { M } from "./materials"
-import { BeachUmbrella, Garland, Gift, LightArch, Nativity, NochebuenaTable, Wreath } from "./HolidayDecor"
-import { Ball, Block, Cyl, Cypress, Lamp, Palm, SunOrnament, Tree } from "./primitives"
+import { BeachUmbrella, Garland, Gift, LightArch, Nativity, Wreath } from "./HolidayDecor"
+import { Ball, Block, Cyl, Cypress, Lamp, Palm, SunOrnament, Tree, type V3 } from "./primitives"
 
 const Q = Math.PI / 4
 const pillarGeo = new THREE.BoxGeometry(0.05, 0.13, 0.06)
@@ -44,6 +44,38 @@ export function Tokyo() {
   )
 }
 
+function BuenosAiresStreetTree({ p, h = 0.6 }: { p: V3; h?: number }) {
+  return (
+    <group position={p} scale={h}>
+      <Cyl p={[0, 0.26, 0]} rt={0.033} rb={0.052} h={0.52} m={M.sand} />
+      <Cyl p={[-0.07, 0.47, 0]} rt={0.018} rb={0.03} h={0.29} r={[0, 0, 0.52]} m={M.sand} />
+      <Cyl p={[0.08, 0.49, 0.015]} rt={0.016} rb={0.029} h={0.3} r={[0, 0, -0.6]} m={M.sand} />
+      <Ball p={[-0.16, 0.65, 0]} r={0.23} s={[1, 1.03, 0.88]} m={M.green} />
+      <Ball p={[0.15, 0.68, -0.025]} r={0.24} s={[1, 1.06, 0.9]} m={M.greenDeep} />
+      <Ball p={[0, 0.81, 0.015]} r={0.25} s={[1.1, 0.92, 0.96]} m={M.green} />
+      <Ball p={[0.015, 0.62, 0.14]} r={0.21} s={[1.15, 0.9, 0.8]} m={M.green} />
+    </group>
+  )
+}
+
+function BuenosAiresBuilding({ p, h, rotY = 0 }: { p: V3; h: number; rotY?: number }) {
+  return (
+    <group position={p} rotation={[0, rotY, 0]}>
+      <Block p={[0, h / 2, 0]} s={[0.28, h, 0.23]} m={M.cream} />
+      <Block p={[0, h + 0.016, 0]} s={[0.32, 0.032, 0.26]} m={M.ivory} />
+      <Block p={[0, h + 0.043, 0]} s={[0.29, 0.024, 0.23]} m={M.goldSoft} />
+      <Block p={[0, h * 0.38, 0.12]} s={[0.3, 0.02, 0.025]} m={M.ivory} />
+      <Block p={[0, h * 0.7, 0.12]} s={[0.3, 0.018, 0.025]} m={M.ivory} />
+      <Block p={[-0.07, h * 0.82, 0.119]} s={[0.047, h * 0.13, 0.014]} m={M.greenDeep} />
+      <Block p={[0.07, h * 0.82, 0.119]} s={[0.047, h * 0.13, 0.014]} m={M.greenDeep} />
+      <Block p={[-0.07, h * 0.53, 0.119]} s={[0.047, h * 0.13, 0.014]} m={M.green} />
+      <Block p={[0.07, h * 0.53, 0.119]} s={[0.047, h * 0.13, 0.014]} m={M.green} />
+      <Block p={[0, h * 0.17, 0.12]} s={[0.065, h * 0.29, 0.018]} m={M.redDeep} />
+      <Garland p={[0, h * 0.69, 0.143]} width={0.26} drop={0.045} />
+    </group>
+  )
+}
+
 export function BuenosAires() {
   return (
     <group>
@@ -61,10 +93,12 @@ export function BuenosAires() {
       <Block p={[0, 0.033, 0.4]} s={[0.022, 0.006, 0.08]} round={0.002} m={M.gold} />
       <Block p={[0, 0.033, 0.6]} s={[0.022, 0.006, 0.08]} round={0.002} m={M.gold} />
 
-      <Palm p={[-0.55, 0, -0.36]} h={0.72} lean={0.1} />
-      <Palm p={[0.55, 0, 0.1]} h={0.6} lean={-0.12} rotY={0.5} />
-      <Palm p={[-0.52, 0, 0.45]} h={0.5} lean={0.14} rotY={2} />
-      <Palm p={[0.42, 0, -0.42]} h={0.45} lean={0.1} rotY={1.2} />
+      <BuenosAiresBuilding p={[-0.47, 0, -0.46]} h={0.65} rotY={0.14} />
+      <BuenosAiresBuilding p={[0.37, 0, -0.48]} h={0.55} rotY={-0.12} />
+      <BuenosAiresBuilding p={[0.72, 0, -0.13]} h={0.43} rotY={-0.25} />
+      <BuenosAiresStreetTree p={[-0.75, 0, 0.02]} h={0.61} />
+      <BuenosAiresStreetTree p={[0.65, 0, 0.32]} h={0.54} />
+      <BuenosAiresStreetTree p={[-0.53, 0, 0.62]} h={0.48} />
 
       <group position={[0.36, 0, 0.58]} rotation={[0, 0.25, 0]}>
         <Block p={[0, 0.11, 0]} s={[0.34, 0.16, 0.15]} m={M.red} />
@@ -73,7 +107,6 @@ export function BuenosAires() {
         <Cyl p={[-0.1, 0.035, 0.07]} rt={0.035} rb={0.035} h={0.025} r={[Math.PI / 2, 0, 0]} m={M.greenDeep} />
       </group>
       <Tree p={[-0.24, 0, 0.24]} h={0.61} />
-      <NochebuenaTable p={[-0.59, 0, 0.77]} rot={0.25} />
       <Gift p={[-0.29, 0, 0.59]} size={0.15} />
       <Gift p={[0.12, 0, 0.85]} size={0.11} green rot={-0.2} />
       <Wreath p={[0, 0.39, -0.091]} r={0.075} />
