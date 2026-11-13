@@ -50,25 +50,77 @@ function easeOutBack(x: number) {
   return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
 }
 
+// Soft fresnel rim: real glass brightens (not darkens) at grazing angles.
+const rimMaterial = new THREE.ShaderMaterial({
+  transparent: true,
+  depthWrite: false,
+  blending: THREE.AdditiveBlending,
+  uniforms: { uColor: { value: new THREE.Color("#fff6e6") }, uStrength: { value: 0.42 } },
+  vertexShader: `
+    varying vec3 vN;
+    varying vec3 vV;
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vN = normalize(normalMatrix * normal);
+      vV = normalize(-mv.xyz);
+      gl_Position = projectionMatrix * mv;
+    }
+  `,
+  fragmentShader: `
+    uniform vec3 uColor;
+    uniform float uStrength;
+    varying vec3 vN;
+    varying vec3 vV;
+    void main() {
+      float f = 1.0 - clamp(dot(normalize(vN), normalize(vV)), 0.0, 1.0);
+      float rim = smoothstep(0.55, 1.0, f);
+      rim = pow(rim, 1.6);
+      // fade the very outer pixel so the silhouette stays crisp, not haloed
+      rim *= 1.0 - smoothstep(0.985, 1.0, f) * 0.6;
+      gl_FragColor = vec4(uColor * rim * uStrength, 1.0);
+    }
+  `,
+})
+
 function Glass() {
   return (
-    <mesh renderOrder={10}>
-      <sphereGeometry args={[R_GLASS, 128, 96]} />
-      <meshPhysicalMaterial
-        color="#ffffff"
-        transmission={1}
-        thickness={0.6}
-        roughness={0.035}
-        ior={1.42}
-        metalness={0}
-        clearcoat={1}
-        clearcoatRoughness={0.06}
-        envMapIntensity={1.25}
-        specularIntensity={0.8}
-        attenuationColor="#fff4e0"
-        attenuationDistance={4}
-      />
-    </mesh>
+    <group>
+      {/* inner wall: faint second reflection that sells the glass thickness */}
+      <mesh renderOrder={9}>
+        <sphereGeometry args={[R_GLASS * 0.985, 96, 72]} />
+        <meshPhysicalMaterial
+          color="#ffffff"
+          transparent
+          opacity={0.06}
+          roughness={0.05}
+          metalness={0}
+          envMapIntensity={0.9}
+          side={THREE.BackSide}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh renderOrder={10}>
+        <sphereGeometry args={[R_GLASS, 128, 96]} />
+        <meshPhysicalMaterial
+          color="#ffffff"
+          transmission={1}
+          thickness={0.12}
+          roughness={0.02}
+          ior={1.3}
+          metalness={0}
+          clearcoat={1}
+          clearcoatRoughness={0.04}
+          envMapIntensity={1.1}
+          specularIntensity={0.7}
+          specularColor="#fffaf0"
+          attenuationColor="#fffaf2"
+          attenuationDistance={20}
+        />
+      </mesh>
+      <mesh renderOrder={11} material={rimMaterial}>
+        <sphereGeometry args={[R_GLASS * 1.002, 96, 72]} />
+      </mesh>
+    </group>
   )
 }
 
@@ -203,6 +255,10 @@ function Lights() {
         <Lightformer form="rect" intensity={1.6} position={[4.5, 1, -1]} scale={[2, 6, 1]} color="#ffd59a" />
         <Lightformer form="circle" intensity={1.6} position={[2.5, 2.5, 5]} scale={1.8} color="#fff3e2" />
         <Lightformer form="rect" intensity={1.2} position={[0, -4, 2]} scale={[8, 2, 1]} color="#f3e3c6" />
+        {/* Warm cream wall behind/around the globe: the glass rim reflects this instead of a dark void */}
+        <Lightformer form="rect" intensity={1.1} position={[0, 0.5, -7]} scale={[16, 10, 1]} color="#f4e8d2" />
+        <Lightformer form="rect" intensity={0.8} position={[-7, 0.5, -1]} scale={[6, 10, 1]} color="#f4e8d2" />
+        <Lightformer form="rect" intensity={0.8} position={[7, 0.5, -1]} scale={[6, 10, 1]} color="#f4e8d2" />
       </Environment>
     </>
   )
