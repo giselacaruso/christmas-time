@@ -128,10 +128,10 @@ type:
       lineHeight: "1.45"
     display:
       fontKey: playfair-display
-      fontSize: 5rem
+      fontSize: 4.375rem
       fontStyle: normal
       letterSpacing: -0.025em
-      lineHeight: "0.95"
+      lineHeight: "0.714286"
     heading:
       fontKey: cormorant-garamond
       fontSize: 2.25rem

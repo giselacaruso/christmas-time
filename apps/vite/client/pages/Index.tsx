@@ -33,7 +33,7 @@ export default function Index() {
         <section id="selected-city-info" aria-label="Información del destino seleccionado" aria-live="polite" aria-atomic="true" className="flex flex-col items-start gap-ds-sm text-left" data-oid="7f92051768">
           <div className="flex flex-wrap items-baseline gap-x-ds-lg gap-y-ds-sm" data-oid="81ab669d79">
             <h2 className="type-label uppercase text-foreground" data-oid="8aa460861c">{city.country}</h2>
-            <p className="flex items-center gap-ds-sm type-body text-foreground" data-oid="9e70bcaee2" data-oid-text-editable="false" data-oid-text-source="expression:6c722ae4093f|expression:b48ae97fa8b1">
+            <p className="flex items-center gap-ds-sm type-body text-foreground" data-oid="9e70bcaee2" data-oid-text-editable="false" data-oid-text-source="expression:2c93c8ef1f58|expression:b48ae97fa8b1">
               {city.climate === "snow" ? <Snowflake aria-label="Invierno" className="size-4" strokeWidth={1.2} data-oid="e360b2b422" /> : <Sun aria-label="Clima cálido" className="size-4" strokeWidth={1.2} data-oid="b4a871ad4c" />}
               {city.temp}
             </p>
