@@ -85,7 +85,12 @@ font:
     fallback: sans-serif
     source: google
     sourceFamilyId: DM Sans
-id: 6c729bdb-a77c-4af5-ac6b-4877a62bf3eb
+  playfair-display:
+    cssFamilyName: Playfair Display
+    fallback: serif
+    source: google
+    sourceFamilyId: Playfair Display
+id: 461abcb5-f600-4dfd-ba9e-0b4312d2eaa0
 radii:
   full: 9999px
   lg: 0.875rem
@@ -116,8 +121,8 @@ type:
       letterSpacing: 0.04em
       lineHeight: "1.45"
     display:
-      fontKey: cormorant-garamond
-      fontSize: 6.5rem
+      fontKey: playfair-display
+      fontSize: 5rem
       fontStyle: normal
       letterSpacing: -0.025em
       lineHeight: "0.95"
@@ -136,7 +141,7 @@ type:
   weights:
     body: 300
     caption: 400
-    display: 500
+    display: 400
     heading: 500
     label: 500
 version: 1

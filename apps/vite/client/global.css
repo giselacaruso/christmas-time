@@ -43,6 +43,7 @@
 
   --ds-font-cormorant-garamond: "Cormorant Garamond", serif;
   --ds-font-dm-sans: "DM Sans", sans-serif;
+  --ds-font-playfair-display: "Playfair Display", serif;
 }
 @theme inline {
   --color-background: var(--background);
@@ -94,10 +95,10 @@
   --text-caption--letter-spacing: 0.04em;
   --font-caption: var(--ds-font-dm-sans);
   --font-style-caption: normal;
-  --text-display: 6.5rem;
+  --text-display: 5rem;
   --text-display--line-height: 0.95;
   --text-display--letter-spacing: -0.025em;
-  --font-display: var(--ds-font-cormorant-garamond);
+  --font-display: var(--ds-font-playfair-display);
   --font-style-display: normal;
   --text-heading: 2.25rem;
   --text-heading--line-height: 1.15;
@@ -114,7 +115,7 @@
 
   --font-weight-body: 300;
   --font-weight-caption: 400;
-  --font-weight-display: 500;
+  --font-weight-display: 400;
   --font-weight-heading: 500;
   --font-weight-label: 500;
 

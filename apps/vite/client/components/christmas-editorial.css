@@ -1,11 +1,10 @@
 .christmas-editorial {
-  /* This proposal uses a neutral gallery ground; ceramic materials keep the
-     original cream, red, fir and gold design-system colors in the 3D scene. */
+  /* Uses the design-system cream porcelain ground, ink foreground and
+     muted tokens directly from global.css. */
   color-scheme: light;
-  --background: var(--color-white, Canvas);
-  --foreground: var(--color-black, CanvasText);
-  --muted-foreground: color-mix(in srgb, var(--foreground) 54%, var(--background));
-  --border: color-mix(in srgb, var(--foreground) 14%, var(--background));
+  background-image:
+    radial-gradient(ellipse at 78% 40%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 55%),
+    radial-gradient(ellipse at 10% 100%, color-mix(in srgb, var(--secondary) 6%, transparent) 0%, transparent 50%);
 }
 
 .christmas-editorial .city-name {
