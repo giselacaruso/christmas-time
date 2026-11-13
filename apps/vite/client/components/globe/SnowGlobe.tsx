@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef, useState, type MutableRefObject, type PointerEvent, type ReactNode } from "react"
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type MutableRefObject, type PointerEvent, type ReactNode } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import { ContactShadows, Environment, Lightformer } from "@react-three/drei"
 import * as THREE from "three"
 import type { City } from "../../data/cities"
 import { London, Moscow, NewYork, Paris } from "./ColdCities"
 import { BuenosAires, Dubai, Rio, Rome, Sydney, Tokyo } from "./WarmCities"
+import { Bangkok, Cancun, SanFrancisco, Toronto, Vienna } from "./NewCities"
 import { M } from "./materials"
 import { Particles } from "./Particles"
 import { GROUND_R, GROUND_Y, R_GLASS, createShake, type ShakeState } from "./shake"
@@ -22,6 +23,11 @@ const SCENES: Record<string, () => JSX.Element> = {
   moscu: Moscow,
   dubai: Dubai,
   rio: Rio,
+  "san-francisco": SanFrancisco,
+  cancun: Cancun,
+  toronto: Toronto,
+  bangkok: Bangkok,
+  viena: Vienna,
 }
 
 const GROUND_MAT = { snow: M.ivory, grass: M.green, sand: M.sand }
@@ -45,7 +51,7 @@ const baseMat = M.red.clone()
 baseMat.side = THREE.DoubleSide
 
 function easeOutBack(x: number) {
-  const c1 = 1.70158
+  const c1 = 1.1
   const c3 = c1 + 1
   return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
 }
@@ -148,38 +154,103 @@ function Base() {
   )
 }
 
+interface Part {
+  obj: THREE.Object3D
+  baseY: number
+  baseRz: number
+  depth: number
+  inDelay: number
+  outDelay: number
+  from: number
+  cur: number
+  sway: number
+}
+
+const OUT_DUR = 0.42
+const IN_DUR = 0.85
+const STAGGER = 0.06
+
+function collectParts(root: THREE.Group): Part[] {
+  const scene = root.children[0]
+  if (!scene) return []
+  const box = new THREE.Box3()
+  const list = scene.children.map((obj) => {
+    box.setFromObject(obj)
+    const h = box.isEmpty() ? 0.5 : box.max.y - box.min.y
+    const depth = h + Math.max(0, obj.position.y) + 0.3
+    return {
+      obj,
+      baseY: obj.position.y,
+      baseRz: obj.rotation.z,
+      depth,
+      inDelay: 0,
+      outDelay: 0,
+      from: 0,
+      cur: depth,
+      sway: (Math.random() - 0.5) * 0.14,
+      dist: Math.hypot(obj.position.x, obj.position.z),
+    }
+  })
+  const order = [...list].sort((a, b) => a.dist - b.dist)
+  order.forEach((p, rank) => {
+    p.inDelay = rank * STAGGER
+    p.outDelay = (order.length - 1 - rank) * STAGGER * 0.5
+  })
+  return list
+}
+
 function Stage({ city, shake }: { city: City; shake: MutableRefObject<ShakeState> }) {
   const [shown, setShown] = useState(city)
   const latest = useRef(city)
   latest.current = city
-  const anim = useRef<{ s: number; phase: "in" | "out" | "idle" }>({ s: 0, phase: "in" })
+  const anim = useRef<{ t: number; phase: "swap" | "in" | "out" | "idle" }>({ t: 0, phase: "swap" })
+  const parts = useRef<Part[]>([])
   const group = useRef<THREE.Group>(null)
 
+  // Collect the new city's pieces and tuck each one under the ground, right where it stands.
+  useLayoutEffect(() => {
+    parts.current = group.current ? collectParts(group.current) : []
+    for (const p of parts.current) p.obj.position.y = p.baseY - p.depth
+    anim.current = { t: 0, phase: "in" }
+  }, [shown.id])
+
   useEffect(() => {
-    if (city.id !== shown.id) anim.current.phase = "out"
+    if (city.id === shown.id && anim.current.phase !== "out") return
+    if (anim.current.phase === "out") return
+    for (const p of parts.current) p.from = p.cur
+    anim.current = { t: 0, phase: "out" }
   }, [city.id, shown.id])
 
   useFrame((_, raw) => {
     const dt = Math.min(raw, 1 / 30)
     const a = anim.current
-    if (a.phase === "out") {
-      a.s -= dt * 4.5
-      if (a.s <= 0) {
-        a.s = 0
-        a.phase = "in"
-        setShown(latest.current)
+    if (a.phase === "idle" || a.phase === "swap") return
+    a.t += dt
+    let done = true
+    for (const p of parts.current) {
+      if (a.phase === "out") {
+        const k = THREE.MathUtils.clamp((a.t - p.outDelay) / OUT_DUR, 0, 1)
+        if (k < 1) done = false
+        p.cur = p.from + (p.depth - p.from) * k * k
+        p.obj.rotation.z = p.baseRz + p.sway * Math.sin(k * Math.PI)
+      } else {
+        const k = THREE.MathUtils.clamp((a.t - p.inDelay) / IN_DUR, 0, 1)
+        if (k < 1) done = false
+        p.cur = p.depth * (1 - easeOutBack(k))
+        p.obj.rotation.z = p.baseRz + p.sway * Math.sin(k * Math.PI) * (1 - k)
       }
-    } else if (a.phase === "in") {
-      a.s += dt * 1.7
-      if (a.s >= 1) {
-        a.s = 1
-        a.phase = "idle"
-      }
+      p.obj.position.y = p.baseY - p.cur
     }
-    const k = a.phase === "out" ? a.s * a.s : easeOutBack(a.s)
-    if (group.current) {
-      group.current.scale.setScalar(Math.max(0.001, k))
-      group.current.rotation.y = (1 - a.s) * -0.9
+    if (!done) return
+    if (a.phase === "out") {
+      if (latest.current.id !== shown.id) {
+        anim.current = { t: 0, phase: "swap" }
+        setShown(latest.current)
+      } else {
+        anim.current = { t: 0, phase: "in" }
+      }
+    } else {
+      anim.current = { t: 0, phase: "idle" }
     }
   })
 
