@@ -64,7 +64,7 @@ export function CitySlider({ cities, index, onSelect, onPrev, onNext }: Props) {
 
             <motion.div variants={revealLate} data-oid="29fd29f81b">
               <div className="mt-ds-xl flex items-center gap-ds-lg" data-oid="62397ea9e4">
-                <div className="flex items-center gap-ds-sm" data-oid="a764c58f41" data-oid-text-editable="false" data-oid-text-source="expression:028f66ba288d|element:span">
+                <div className="flex items-center gap-ds-sm" data-oid="a764c58f41" data-oid-text-editable="false" data-oid-text-source="expression:91b2d78b95e3|element:span">
                   {city.climate === "snow" ? (
                     <Snowflake className="h-7 w-7 text-secondary" strokeWidth={1.25} data-oid="0553a10907" />
                   ) : (
