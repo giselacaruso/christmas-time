@@ -3,9 +3,10 @@ import { useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import type { Climate } from "../../data/cities"
 import { flakeMaterial, glitterMaterial } from "./materials"
+import { P } from "./palette"
 import { RMAX, floorAt, type ShakeState } from "./shake"
 
-const GLITTER = ["#d9ad55", "#d9ad55", "#e9c978", "#b8892f", "#e9c978", "#a52d27", "#f4ead6"]
+const GLITTER = [P.gold, P.gold, P.goldSoft, P.gold, P.goldSoft, P.red, P.porcelain]
 
 interface Props {
   climate: Climate
@@ -15,11 +16,11 @@ interface Props {
 
 export function Particles({ climate, density, shake }: Props) {
   const snow = climate === "snow"
-  const count = Math.round((snow ? 760 : 480) * density)
+  const count = Math.round((snow ? 1450 : 650) * density)
   const ref = useRef<THREE.InstancedMesh>(null)
   const dummy = useMemo(() => new THREE.Object3D(), [])
   const geo = useMemo(
-    () => (snow ? new THREE.IcosahedronGeometry(0.019, 1) : new THREE.OctahedronGeometry(0.026, 0)),
+    () => (snow ? new THREE.IcosahedronGeometry(0.0048, 0) : new THREE.PlaneGeometry(0.011, 0.007)),
     [snow],
   )
 
@@ -43,7 +44,7 @@ export function Particles({ climate, density, shake }: Props) {
       p.set([x, y, z], i * 3)
       rot.set([Math.random() * 6, Math.random() * 6, Math.random() * 6], i * 3)
       spin.set([(Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6], i * 3)
-      sc[i] = 0.55 + Math.random() * 0.9
+      sc[i] = 0.45 + Math.pow(Math.random(), 1.6) * 0.85
     }
     return { p, v, rot, spin, sc, rest }
   }, [count])
@@ -67,8 +68,8 @@ export function Particles({ climate, density, shake }: Props) {
     const e = s.energy
     const ax = s.accel.x
     const ay = s.accel.y
-    const g = snow ? 0.26 : 0.62
-    const drag = Math.exp(-(snow ? 2.6 : 1.5) * dt)
+    const g = snow ? 0.19 : 0.29
+    const drag = Math.exp(-(snow ? 3.1 : 2.4) * dt)
     const t = state.clock.elapsedTime
     const jit = e * 2.6
     const { p, v, rot, spin, sc, rest } = d
@@ -87,8 +88,8 @@ export function Particles({ climate, density, shake }: Props) {
       }
 
       if (!rest[i]) {
-        const flutterX = snow ? Math.sin(t * 1.3 + i) * 0.07 : 0
-        const flutterZ = snow ? Math.cos(t * 1.1 + i * 1.7) * 0.07 : 0
+        const flutterX = Math.sin(t * (snow ? 1.3 : 2.6) + i) * (snow ? 0.045 : 0.065)
+        const flutterZ = Math.cos(t * 1.1 + i * 1.7) * 0.045
         v[i3] = (v[i3] + (-ax * 0.08 - pz * e * 0.8 + (Math.random() - 0.5) * jit + flutterX) * dt) * drag
         v[i3 + 1] = (v[i3 + 1] + (-g - ay * 0.08 + e * 0.32 + (Math.random() - 0.5) * jit) * dt) * drag
         v[i3 + 2] = (v[i3 + 2] + (px * e * 0.8 + (Math.random() - 0.5) * jit + flutterZ) * dt) * drag
@@ -137,7 +138,7 @@ export function Particles({ climate, density, shake }: Props) {
       dummy.rotation.set(rot[i3], rot[i3 + 1], rot[i3 + 2])
       const k = sc[i]
       if (snow) dummy.scale.set(k, k * 0.72, k)
-      else dummy.scale.set(k, k * 0.22, k)
+      else dummy.scale.setScalar(k)
       dummy.updateMatrix()
       mesh.setMatrixAt(i, dummy.matrix)
     }

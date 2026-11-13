@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { P } from "./palette"
 
 function makeCanvas(size: number, draw: (g: CanvasRenderingContext2D, size: number) => void) {
   const c = document.createElement("canvas")
@@ -112,7 +113,7 @@ function normalFromHeight(src: HTMLCanvasElement, strength: number) {
 }
 const NORMAL = normalFromHeight(HEIGHT, 2.2)
 
-// Roughness: mostly satin glaze, with slightly matte thin spots and glossy pools.
+// Low-frequency roughness variation belongs to the clay underneath the glaze.
 const ROUGH = makeCanvas(256, (g, s) => {
   g.fillStyle = "rgb(150,150,150)"
   g.fillRect(0, 0, s, s)
@@ -173,7 +174,7 @@ interface CeramicOpts {
   side?: THREE.Side
 }
 
-function ceramic(color: string, { speckled = true, roughness = 0.5, side = THREE.FrontSide }: CeramicOpts = {}) {
+function ceramic(color: string, { speckled = true, roughness = 0.34, side = THREE.FrontSide }: CeramicOpts = {}) {
   const repeat = 1.4 + rnd() * 0.8
   const normal = variant(NORMAL, false, repeat)
   return new THREE.MeshPhysicalMaterial({
@@ -182,24 +183,24 @@ function ceramic(color: string, { speckled = true, roughness = 0.5, side = THREE
     roughness,
     roughnessMap: variant(ROUGH, false, repeat),
     normalMap: normal,
-    normalScale: new THREE.Vector2(0.32, 0.32),
+    normalScale: new THREE.Vector2(0.12, 0.12),
     metalness: 0,
-    // Softer, broader glaze highlight instead of a pin-sharp hotspot.
-    clearcoat: 0.85,
-    clearcoatRoughness: 0.2,
+    // A continuous, smooth glaze over slightly irregular fired clay. Broad
+    // studio sources soften the highlight without making the glaze look matte.
+    ior: 1.5,
+    clearcoat: 1,
+    clearcoatRoughness: 0.095,
     clearcoatNormalMap: normal,
-    clearcoatNormalScale: new THREE.Vector2(0.22, 0.22),
-    specularIntensity: 0.55,
-    specularColor: new THREE.Color("#fff3e0"),
-    sheen: 0.25,
-    sheenRoughness: 0.8,
-    sheenColor: new THREE.Color("#fff1dc"),
-    envMapIntensity: 0.85,
+    clearcoatNormalScale: new THREE.Vector2(0.045, 0.045),
+    specularIntensity: 1,
+    specularColor: new THREE.Color(P.porcelain),
+    sheen: 0,
+    envMapIntensity: 1.05,
     side,
   })
 }
 
-function lustre(color: string, roughness = 0.32) {
+function lustre(color: string, roughness = 0.27) {
   const repeat = 1.6 + rnd() * 0.6
   return new THREE.MeshPhysicalMaterial({
     color,
@@ -207,37 +208,45 @@ function lustre(color: string, roughness = 0.32) {
     roughness,
     roughnessMap: variant(ROUGH, false, repeat),
     normalMap: variant(NORMAL, false, repeat),
-    normalScale: new THREE.Vector2(0.25, 0.25),
+    normalScale: new THREE.Vector2(0.07, 0.07),
     clearcoat: 0.45,
-    clearcoatRoughness: 0.22,
-    envMapIntensity: 0.9,
+    clearcoatRoughness: 0.12,
+    envMapIntensity: 1.1,
   })
 }
 
 export const M = {
-  cream: ceramic("#f1e6d0"),
-  creamDouble: ceramic("#f1e6d0", { side: THREE.DoubleSide }),
-  ivory: ceramic("#fbf7ef", { roughness: 0.6 }),
-  red: ceramic("#a52d27", { speckled: false, roughness: 0.42 }),
-  redDeep: ceramic("#741d1a", { speckled: false, roughness: 0.44 }),
-  green: ceramic("#24553a", { speckled: false, roughness: 0.42 }),
-  greenDeep: ceramic("#163a27", { speckled: false, roughness: 0.44 }),
-  sand: ceramic("#dcc08a", { roughness: 0.58 }),
-  gold: lustre("#d6ab52"),
-  goldSoft: lustre("#c99d4c", 0.42),
+  cream: ceramic(P.cream),
+  creamDouble: ceramic(P.cream, { side: THREE.DoubleSide }),
+  ivory: ceramic(P.porcelain, { roughness: 0.36 }),
+  snow: new THREE.MeshPhysicalMaterial({
+    color: P.porcelain,
+    roughness: 0.82,
+    normalMap: variant(NORMAL, false, 7),
+    normalScale: new THREE.Vector2(0.18, 0.18),
+    clearcoat: 0.08,
+    envMapIntensity: 0.65,
+  }),
+  red: ceramic(P.red, { speckled: false, roughness: 0.29 }),
+  redDeep: ceramic(P.redDeep, { speckled: false, roughness: 0.32 }),
+  green: ceramic(P.fir, { speckled: false, roughness: 0.29 }),
+  greenDeep: ceramic(P.firDeep, { speckled: false, roughness: 0.32 }),
+  sand: ceramic(P.sand, { roughness: 0.55 }),
+  gold: lustre(P.gold),
+  goldSoft: lustre(P.goldSoft, 0.38),
 }
 
 export const flakeMaterial = new THREE.MeshPhysicalMaterial({
-  color: "#fdfaf3",
-  roughness: 0.35,
-  clearcoat: 1,
-  clearcoatRoughness: 0.05,
+  color: P.porcelain,
+  roughness: 0.62,
+  clearcoat: 0.15,
+  clearcoatRoughness: 0.2,
 })
 
 export const glitterMaterial = new THREE.MeshStandardMaterial({
-  color: "#ffffff",
-  metalness: 0.95,
-  roughness: 0.14,
+  color: P.porcelain,
+  metalness: 0.78,
+  roughness: 0.3,
   flatShading: true,
   side: THREE.DoubleSide,
 })

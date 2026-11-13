@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { useFrame } from "@react-three/fiber"
 import { RoundedBox } from "@react-three/drei"
 import * as THREE from "three"
@@ -15,8 +15,8 @@ interface BlockProps {
 }
 
 export function Block({ p, s, m = M.cream, r = [0, 0, 0], round }: BlockProps) {
-  const rad = round ?? Math.min(s[0], s[1], s[2]) * 0.18
-  return <RoundedBox args={s} radius={rad} smoothness={3} position={p} rotation={r} material={m} castShadow receiveShadow />
+  const rad = round ?? Math.min(s[0], s[1], s[2]) * 0.22
+  return <RoundedBox args={s} radius={rad} smoothness={5} position={p} rotation={r} material={m} castShadow receiveShadow />
 }
 
 interface CylProps {
@@ -30,10 +30,28 @@ interface CylProps {
 }
 
 export function Cyl({ p, rt, rb, h, seg = 32, m = M.cream, r = [0, 0, 0] }: CylProps) {
+  const geometry = useMemo(() => {
+    // Keep architectural pyramids polygonal, but roll the edges of turned
+    // ceramic pieces so the glaze catches a continuous highlight at the lip.
+    if (seg < 12) return new THREE.CylinderGeometry(rt, rb, h, seg)
+    const b = Math.min(h * 0.12, Math.max(rt, rb) * 0.12)
+    const profile = new THREE.Path()
+    profile.moveTo(0, -h / 2)
+    profile.lineTo(Math.max(0, rb - b), -h / 2)
+    profile.quadraticCurveTo(rb, -h / 2, rb, -h / 2 + b)
+    if (rt > b) {
+      profile.lineTo(rt, h / 2 - b)
+      profile.quadraticCurveTo(rt, h / 2, rt - b, h / 2)
+    } else {
+      profile.lineTo(Math.max(rt, b * 0.2), h / 2 - b * 0.5)
+      profile.quadraticCurveTo(rt, h / 2, 0, h / 2)
+    }
+    profile.lineTo(0, h / 2)
+    return new THREE.LatheGeometry(profile.getPoints(6), Math.max(48, seg))
+  }, [rt, rb, h, seg])
+  useEffect(() => () => geometry.dispose(), [geometry])
   return (
-    <mesh position={p} rotation={r} material={m} castShadow receiveShadow>
-      <cylinderGeometry args={[rt, rb, h, seg]} />
-    </mesh>
+    <mesh position={p} rotation={r} geometry={geometry} material={m} castShadow receiveShadow />
   )
 }
 
@@ -53,8 +71,23 @@ export function Ball({ p, r, m = M.cream, s = [1, 1, 1], rot = [0, 0, 0] }: Ball
   )
 }
 
+const TREE_PROFILE = [
+  [0, 0.1], [0.26, 0.1], [0.335, 0.125], [0.34, 0.15],
+  [0.3, 0.205], [0.21, 0.32], [0.165, 0.385],
+  [0.245, 0.365], [0.26, 0.395], [0.225, 0.46],
+  [0.14, 0.585], [0.11, 0.635], [0.17, 0.62],
+  [0.176, 0.65], [0.135, 0.73], [0.05, 0.875], [0, 0.965],
+]
+
 export function Tree({ p, h = 0.6, snow = false }: { p: V3; h?: number; snow?: boolean }) {
-  const tiers = [0, 1, 2]
+  const geometry = useMemo(() => {
+    const curve = new THREE.CatmullRomCurve3(
+      TREE_PROFILE.map(([radius, y]) => new THREE.Vector3(radius * h, y * h, 0)),
+      false, "centripetal",
+    )
+    return new THREE.LatheGeometry(curve.getPoints(160).map((v) => new THREE.Vector2(Math.max(0, v.x), v.y)), 64)
+  }, [h])
+  useEffect(() => () => geometry.dispose(), [geometry])
   const baubles = [
     [0, 0.2],
     [2.1, 0.2],
@@ -67,17 +100,12 @@ export function Tree({ p, h = 0.6, snow = false }: { p: V3; h?: number; snow?: b
   return (
     <group position={p}>
       <Cyl p={[0, h * 0.08, 0]} rt={h * 0.05} rb={h * 0.065} h={h * 0.16} m={M.goldSoft} />
-      {tiers.map((k) => {
-        const H = h * 0.42
-        const R = h * (0.36 - k * 0.085)
-        const y = h * (0.32 + k * 0.2)
-        return (
-          <group key={k}>
-            <Cyl p={[0, y, 0]} rt={0} rb={R} h={H} seg={28} m={M.green} />
-            {snow && <Cyl p={[0, y + H * 0.5 - H * 0.2, 0]} rt={0} rb={R * 0.42} h={H * 0.4} seg={28} m={M.ivory} />}
-          </group>
-        )
-      })}
+      <mesh geometry={geometry} material={M.green} castShadow receiveShadow />
+      {snow && <>
+        <Ball p={[-h * 0.16, h * 0.29, h * 0.14]} r={h * 0.08} s={[1.5, 0.32, 0.8]} rot={[0.3, 0.4, -0.6]} m={M.snow} />
+        <Ball p={[h * 0.12, h * 0.51, h * 0.1]} r={h * 0.065} s={[1.4, 0.32, 0.8]} rot={[0.3, -0.4, 0.6]} m={M.snow} />
+        <Ball p={[-h * 0.04, h * 0.82, h * 0.035]} r={h * 0.04} s={[1, 1.4, 0.7]} rot={[0, 0, -0.5]} m={M.snow} />
+      </>}
       {baubles.map(([a, t], i) => {
         const y = h * (0.18 + t * 0.85)
         const rad = h * 0.36 * (1 - t * 0.78) * 0.82
@@ -146,12 +174,26 @@ interface HouseProps {
 
 export function House({ p, w = 0.24, h = 0.2, d = 0.2, roof = M.red, rotY = 0 }: HouseProps) {
   const rr = (d * 1.12) / 1.732
+  const roofGeometry = useMemo(() => {
+    const profile = new THREE.Shape()
+    profile.moveTo(-d * 0.56, 0)
+    profile.lineTo(d * 0.56, 0)
+    profile.lineTo(0, rr * 1.5)
+    profile.closePath()
+    return new THREE.ExtrudeGeometry(profile, {
+      depth: w * 1.06,
+      bevelEnabled: true,
+      bevelThickness: Math.min(w, d) * 0.025,
+      bevelSize: Math.min(w, d) * 0.035,
+      bevelSegments: 4,
+      steps: 1,
+    })
+  }, [w, d, rr])
+  useEffect(() => () => roofGeometry.dispose(), [roofGeometry])
   return (
     <group position={p} rotation={[0, rotY, 0]}>
       <Block p={[0, h / 2, 0]} s={[w, h, d]} />
-      <mesh position={[0, h + rr * 0.5, 0]} rotation={[0, 0, Math.PI / 2]} material={roof} castShadow receiveShadow>
-        <cylinderGeometry args={[rr, rr, w * 1.1, 3, 1, false, Math.PI / 2]} />
-      </mesh>
+      <mesh position={[-w * 0.53, h, 0]} rotation={[0, Math.PI / 2, 0]} geometry={roofGeometry} material={roof} castShadow receiveShadow />
       <Block p={[0, h * 0.28, d / 2 + 0.004]} s={[w * 0.22, h * 0.5, 0.012]} m={M.gold} />
       <Block p={[-w * 0.3, h * 0.62, d / 2 + 0.004]} s={[w * 0.16, h * 0.22, 0.01]} m={M.goldSoft} />
       <Block p={[w * 0.3, h * 0.62, d / 2 + 0.004]} s={[w * 0.16, h * 0.22, 0.01]} m={M.goldSoft} />

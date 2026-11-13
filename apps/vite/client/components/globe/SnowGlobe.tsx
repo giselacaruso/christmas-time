@@ -1,16 +1,15 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type MutableRefObject, type PointerEvent, type ReactNode } from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
-import { ContactShadows, Environment, Lightformer } from "@react-three/drei"
 import * as THREE from "three"
 import type { City } from "../../data/cities"
 import { London, Moscow, NewYork, Paris } from "./ColdCities"
 import { BuenosAires, Dubai, Rio, Rome, Sydney, Tokyo } from "./WarmCities"
 import { Bangkok, Cancun, SanFrancisco, Toronto, Vienna } from "./NewCities"
 import { M } from "./materials"
+import { GlobeGlass, GroundShadow, StudioLights } from "./GlobeStudio"
+import { P } from "./palette"
 import { Particles } from "./Particles"
-import { GROUND_R, GROUND_Y, R_GLASS, createShake, type ShakeState } from "./shake"
-
-const BG = "#fbf6ec"
+import { GROUND_R, GROUND_Y, createShake, floorAt, type ShakeState } from "./shake"
 
 const SCENES: Record<string, () => JSX.Element> = {
   "nueva-york": NewYork,
@@ -30,22 +29,24 @@ const SCENES: Record<string, () => JSX.Element> = {
   viena: Vienna,
 }
 
-const GROUND_MAT = { snow: M.ivory, grass: M.green, sand: M.sand }
+const GROUND_MAT = { snow: M.snow, grass: M.green, sand: M.sand }
 
-const BASE_PROFILE: [number, number][] = [
-  [0, -1.9],
-  [1.5, -1.9],
-  [1.56, -1.87],
-  [1.56, -1.8],
-  [1.48, -1.74],
-  [1.4, -1.58],
-  [1.36, -1.42],
-  [1.38, -1.32],
-  [1.31, -1.22],
-  [1.27, -1.1],
-  [1.22, -1.06],
-  [0, -1.06],
-]
+function makeBaseGeometry() {
+  const profile = new THREE.Path()
+  profile.moveTo(0, -1.9)
+  profile.lineTo(1.49, -1.9)
+  profile.quadraticCurveTo(1.565, -1.9, 1.565, -1.845)
+  profile.quadraticCurveTo(1.565, -1.8, 1.52, -1.77)
+  profile.lineTo(1.45, -1.7)
+  profile.quadraticCurveTo(1.4, -1.62, 1.37, -1.47)
+  profile.quadraticCurveTo(1.35, -1.4, 1.38, -1.35)
+  profile.quadraticCurveTo(1.395, -1.32, 1.36, -1.28)
+  profile.lineTo(1.3, -1.19)
+  profile.quadraticCurveTo(1.27, -1.14, 1.27, -1.1)
+  profile.quadraticCurveTo(1.27, -1.06, 1.22, -1.06)
+  profile.lineTo(0, -1.06)
+  return new THREE.LatheGeometry(profile.getPoints(12), 160)
+}
 
 const baseMat = M.red.clone()
 baseMat.side = THREE.DoubleSide
@@ -56,82 +57,8 @@ function easeOutBack(x: number) {
   return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2)
 }
 
-// Soft fresnel rim: real glass brightens (not darkens) at grazing angles.
-const rimMaterial = new THREE.ShaderMaterial({
-  transparent: true,
-  depthWrite: false,
-  blending: THREE.AdditiveBlending,
-  uniforms: { uColor: { value: new THREE.Color("#fff6e6") }, uStrength: { value: 0.42 } },
-  vertexShader: `
-    varying vec3 vN;
-    varying vec3 vV;
-    void main() {
-      vec4 mv = modelViewMatrix * vec4(position, 1.0);
-      vN = normalize(normalMatrix * normal);
-      vV = normalize(-mv.xyz);
-      gl_Position = projectionMatrix * mv;
-    }
-  `,
-  fragmentShader: `
-    uniform vec3 uColor;
-    uniform float uStrength;
-    varying vec3 vN;
-    varying vec3 vV;
-    void main() {
-      float f = 1.0 - clamp(dot(normalize(vN), normalize(vV)), 0.0, 1.0);
-      float rim = smoothstep(0.55, 1.0, f);
-      rim = pow(rim, 1.6);
-      // fade the very outer pixel so the silhouette stays crisp, not haloed
-      rim *= 1.0 - smoothstep(0.985, 1.0, f) * 0.6;
-      gl_FragColor = vec4(uColor * rim * uStrength, 1.0);
-    }
-  `,
-})
-
-function Glass() {
-  return (
-    <group>
-      {/* inner wall: faint second reflection that sells the glass thickness */}
-      <mesh renderOrder={9}>
-        <sphereGeometry args={[R_GLASS * 0.985, 96, 72]} />
-        <meshPhysicalMaterial
-          color="#ffffff"
-          transparent
-          opacity={0.06}
-          roughness={0.05}
-          metalness={0}
-          envMapIntensity={0.9}
-          side={THREE.BackSide}
-          depthWrite={false}
-        />
-      </mesh>
-      <mesh renderOrder={10}>
-        <sphereGeometry args={[R_GLASS, 128, 96]} />
-        <meshPhysicalMaterial
-          color="#ffffff"
-          transmission={1}
-          thickness={0.12}
-          roughness={0.02}
-          ior={1.3}
-          metalness={0}
-          clearcoat={1}
-          clearcoatRoughness={0.04}
-          envMapIntensity={1.1}
-          specularIntensity={0.7}
-          specularColor="#fffaf0"
-          attenuationColor="#fffaf2"
-          attenuationDistance={20}
-        />
-      </mesh>
-      <mesh renderOrder={11} material={rimMaterial}>
-        <sphereGeometry args={[R_GLASS * 1.002, 96, 72]} />
-      </mesh>
-    </group>
-  )
-}
-
 function Base() {
-  const geo = useMemo(() => new THREE.LatheGeometry(BASE_PROFILE.map(([x, y]) => new THREE.Vector2(x, y)), 128), [])
+  const geo = useMemo(makeBaseGeometry, [])
   return (
     <group>
       <mesh geometry={geo} material={baseMat} castShadow receiveShadow />
@@ -180,7 +107,8 @@ function collectParts(root: THREE.Group): Part[] {
     const depth = h + Math.max(0, obj.position.y) + 0.3
     return {
       obj,
-      baseY: obj.position.y,
+      // Seat each piece on the curved terrain instead of floating above its rim.
+      baseY: obj.position.y + floorAt(obj.position.x, obj.position.z) - GROUND_Y - 0.148,
       baseRz: obj.rotation.z,
       depth,
       inDelay: 0,
@@ -297,44 +225,6 @@ function GlobeRig({ shake, children }: { shake: MutableRefObject<ShakeState>; ch
   return <group ref={ref}>{children}</group>
 }
 
-function Lights() {
-  return (
-    <>
-      <hemisphereLight args={["#fff4e2", "#6b4a2e", 0.6]} />
-      <directionalLight
-        position={[3.5, 6, 4.5]}
-        intensity={2.1}
-        color="#fff1dc"
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-radius={6}
-        shadow-blurSamples={16}
-        shadow-bias={-0.0003}
-        shadow-normalBias={0.025}
-        shadow-camera-left={-2.2}
-        shadow-camera-right={2.2}
-        shadow-camera-top={2.2}
-        shadow-camera-bottom={-2.2}
-        shadow-camera-near={1}
-        shadow-camera-far={16}
-      />
-      <directionalLight position={[-4, 2, -3]} intensity={0.7} color="#ffd7a8" />
-      <Environment resolution={256} frames={1}>
-        <color attach="background" args={["#3b2c20"]} />
-        <Lightformer form="rect" intensity={1.8} position={[0, 5, 1]} scale={[9, 4, 1]} />
-        <Lightformer form="rect" intensity={2.4} position={[-4, 1.5, 3]} scale={[2.6, 5, 1]} color="#fff6e8" />
-        <Lightformer form="rect" intensity={1.6} position={[4.5, 1, -1]} scale={[2, 6, 1]} color="#ffd59a" />
-        <Lightformer form="circle" intensity={1.6} position={[2.5, 2.5, 5]} scale={1.8} color="#fff3e2" />
-        <Lightformer form="rect" intensity={1.2} position={[0, -4, 2]} scale={[8, 2, 1]} color="#f3e3c6" />
-        {/* Warm cream wall behind/around the globe: the glass rim reflects this instead of a dark void */}
-        <Lightformer form="rect" intensity={1.1} position={[0, 0.5, -7]} scale={[16, 10, 1]} color="#f4e8d2" />
-        <Lightformer form="rect" intensity={0.8} position={[-7, 0.5, -1]} scale={[6, 10, 1]} color="#f4e8d2" />
-        <Lightformer form="rect" intensity={0.8} position={[7, 0.5, -1]} scale={[6, 10, 1]} color="#f4e8d2" />
-      </Environment>
-    </>
-  )
-}
-
 export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) {
   const shake = useRef<ShakeState>(createShake())
   const wrap = useRef<HTMLDivElement>(null)
@@ -388,22 +278,25 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
       onPointerCancel={onUp} data-oid="a5a0ccf6d0" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true"
     >
       <Canvas
-        shadows="variance"
+        shadows
         dpr={[1, 2]}
         camera={{ position: [0, 0.2, 8.2], fov: 30 }}
         gl={{ antialias: true }}
-        onCreated={({ gl }) => gl.setClearColor(BG, 1)}
+        onCreated={({ gl }) => {
+          gl.setClearColor(P.porcelain, 1)
+          gl.shadowMap.type = THREE.PCFSoftShadowMap
+          gl.toneMapping = THREE.ACESFilmicToneMapping
+          gl.toneMappingExposure = 0.95
+        }}
       >
-        <color attach="background" args={[BG]} />
-        <Lights />
+        <color attach="background" args={[P.porcelain]} />
+        <StudioLights />
         <GlobeRig shake={shake}>
           <Base />
           <Stage city={city} shake={shake} />
-          <Glass />
+          <GlobeGlass />
         </GlobeRig>
-        {/* Tight occlusion right under the base + a wide, soft penumbra */}
-        <ContactShadows position={[0, -1.755, 0]} opacity={0.6} scale={3.8} blur={1.1} far={0.35} resolution={512} color="#3e2a18" />
-        <ContactShadows position={[0, -1.76, 0]} opacity={0.32} scale={7.5} blur={3.4} far={2.2} resolution={512} color="#5a3d24" />
+        <GroundShadow />
       </Canvas>
     </div>
   )
