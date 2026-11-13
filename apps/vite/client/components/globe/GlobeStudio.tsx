@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react"
+import { useThree } from "@react-three/fiber"
 import { Environment, Lightformer } from "@react-three/drei"
 import * as THREE from "three"
 import { P } from "./palette"
@@ -9,6 +10,7 @@ const glassEnd = Math.acos(GLASS_SEAT / R_GLASS)
 const neckRadius = Math.sqrt(R_GLASS * R_GLASS - GLASS_SEAT * GLASS_SEAT)
 // Optically clear glass, not a second layer of the cream ceramic glaze.
 const clearGlass = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0.96)
+const studioGround = new THREE.Color(P.porcelain).lerp(new THREE.Color(P.shadow), 0.14)
 
 export function GlobeGlass() {
   return (
@@ -20,13 +22,13 @@ export function GlobeGlass() {
         <meshPhysicalMaterial
           color={clearGlass}
           transmission={1}
-          thickness={0.018}
-          roughness={0.008}
-          ior={1.34}
+          thickness={0.026}
+          roughness={0.018}
+          ior={1.46}
           metalness={0}
           clearcoat={0}
-          envMapIntensity={0.48}
-          specularIntensity={0.58}
+          envMapIntensity={0.82}
+          specularIntensity={0.9}
           depthWrite={false}
           attenuationDistance={Infinity}
         />
@@ -34,7 +36,7 @@ export function GlobeGlass() {
       {/* The tiny rolled glass lip gives the shell actual thickness at its seat. */}
       <mesh position={[0, GLASS_SEAT + 0.012, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={11}>
         <torusGeometry args={[neckRadius, 0.012, 12, 144]} />
-        <meshPhysicalMaterial color={clearGlass} transmission={1} thickness={0.012} roughness={0.018} ior={1.34} envMapIntensity={0.48} specularIntensity={0.58} depthWrite={false} />
+        <meshPhysicalMaterial color={clearGlass} transmission={1} thickness={0.012} roughness={0.018} ior={1.46} envMapIntensity={0.82} specularIntensity={0.9} depthWrite={false} />
       </mesh>
     </group>
   )
@@ -63,21 +65,32 @@ export function StudioLights() {
       {/* Contrasting studio cards produce curved, rectangular reflections on
           the glass and broad, smooth highlights on the ceramic glaze. */}
       <Environment resolution={512} frames={1}>
-        <color attach="background" args={[P.studio]} />
+        <color attach="background" args={[studioGround]} />
         <Lightformer form="rect" intensity={4.5} color={P.porcelain} position={[-4.5, 3.2, 4]} scale={[3, 4.5, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
         <Lightformer form="rect" intensity={3.2} color={P.porcelain} position={[5, 1, 2]} scale={[0.8, 5, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
         <Lightformer form="rect" intensity={1.8} color={P.porcelain} position={[0, 6, 0]} scale={[5, 3, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
         <Lightformer form="rect" intensity={1.1} color={P.fill} position={[-2, 2, -4]} scale={[3, 4, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
+        {/* Narrow studio flags make separate curved dark reflections, not a
+            uniform dark ring, so the clear glass still reads on white. */}
+        <Lightformer form="rect" intensity={0.16} color={P.shadow} position={[-5, 1.4, 0]} scale={[0.65, 3.6, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
+        <Lightformer form="rect" intensity={0.22} color={P.shadow} position={[5, -0.3, -1]} scale={[1.1, 2.8, 1]} onUpdate={(light) => light.lookAt(0, 0, 0)} />
       </Environment>
     </>
   )
 }
 
 export function GroundShadow() {
+  const { gl, size } = useThree()
+  const viewport = useMemo(() => new THREE.Vector2(), [])
+  viewport.set(size.width * gl.getPixelRatio(), size.height * gl.getPixelRatio())
+
   const contact = useMemo(() => new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
-    uniforms: { uColor: { value: new THREE.Color(P.shadow) } },
+    uniforms: {
+      uColor: { value: new THREE.Color(P.shadow) },
+      uViewport: { value: viewport },
+    },
     vertexShader: `
       varying vec2 vUv;
       void main() {
@@ -87,29 +100,55 @@ export function GroundShadow() {
     `,
     fragmentShader: `
       uniform vec3 uColor;
+      uniform vec2 uViewport;
       varying vec2 vUv;
       void main() {
         float r = length((vUv - 0.5) * 2.0);
         float penumbra = (1.0 - smoothstep(0.38, 0.78, r)) * 0.13;
         float contact = (1.0 - smoothstep(0.39, 0.49, r)) * 0.16;
-        gl_FragColor = vec4(uColor, penumbra + contact);
+        vec2 screenUv = gl_FragCoord.xy / uViewport;
+        vec2 edge = min(screenUv, 1.0 - screenUv);
+        float frameFade = smoothstep(0.0, 0.12, min(edge.x, edge.y));
+        gl_FragColor = vec4(uColor, (penumbra + contact) * frameFade);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
       }
     `,
-  }), [])
+  }), [viewport])
   useEffect(() => () => contact.dispose(), [contact])
 
   return (
     <group>
       <mesh position={[0, -1.758, 0]} rotation={[-Math.PI / 2, 0, 0]} material={contact}>
-        <planeGeometry args={[7, 7]} />
+        <planeGeometry args={[6, 6]} />
       </mesh>
       {/* A real shadow receiver: unlike a depth-capture contact pass, it does
           not mistake the transparent glass shell for a solid shadow caster. */}
       <mesh position={[0, -1.756, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <planeGeometry args={[40, 40]} />
-        <shadowMaterial color={P.shadow} transparent opacity={0.22} depthWrite={false} />
+        <planeGeometry args={[6, 6]} />
+        <shadowMaterial
+          color={P.shadow}
+          transparent
+          opacity={0.2}
+          depthWrite={false}
+          onBeforeCompile={(shader) => {
+            shader.uniforms.uShadowViewport = { value: viewport }
+            shader.vertexShader = shader.vertexShader
+              .replace("#include <common>", "#include <common>\nvarying vec2 vFloorUv;")
+              .replace("#include <begin_vertex>", "#include <begin_vertex>\nvFloorUv = uv;")
+            shader.fragmentShader = shader.fragmentShader
+              .replace("#include <common>", "#include <common>\nvarying vec2 vFloorUv;\nuniform vec2 uShadowViewport;")
+              .replace("#include <tonemapping_fragment>", `
+                float floorRadius = length((vFloorUv - 0.5) * 2.0);
+                float floorFade = 1.0 - smoothstep(0.48, 0.88, floorRadius);
+                vec2 screenUv = gl_FragCoord.xy / uShadowViewport;
+                vec2 edge = min(screenUv, 1.0 - screenUv);
+                float frameFade = smoothstep(0.0, 0.12, min(edge.x, edge.y));
+                gl_FragColor.a *= floorFade * frameFade;
+                #include <tonemapping_fragment>
+              `)
+          }}
+        />
       </mesh>
     </group>
   )

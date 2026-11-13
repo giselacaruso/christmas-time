@@ -1,10 +1,15 @@
 .christmas-editorial {
-  /* Uses the design-system cream porcelain ground, ink foreground and
-     muted tokens directly from global.css. */
   color-scheme: light;
-  background-image:
-    radial-gradient(ellipse at 78% 40%, color-mix(in srgb, var(--accent) 10%, transparent) 0%, transparent 55%),
-    radial-gradient(ellipse at 10% 100%, color-mix(in srgb, var(--secondary) 6%, transparent) 0%, transparent 50%);
+}
+
+.christmas-editorial .city-list {
+  text-wrap: balance;
+}
+
+.christmas-editorial .city-number {
+  /* Reset Tailwind's raised superscript: every index starts at cap height. */
+  position: static;
+  vertical-align: top;
 }
 
 .christmas-editorial .city-name {

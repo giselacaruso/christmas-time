@@ -33,7 +33,7 @@ export const CITIES: City[] = [
   {
     id: "londres",
     name: "Londres",
-    listClassName: "italic",
+    listClassName: "not-italic",
     country: "Reino Unido",
     temp: "4 °C",
     weather: "Escarcha y llovizna fría",
@@ -61,7 +61,7 @@ export const CITIES: City[] = [
   {
     id: "tokio",
     name: "Tokio",
-    listClassName: "italic",
+    listClassName: "not-italic",
     country: "Japón",
     temp: "9 °C",
     weather: "Cielo seco e iluminaciones",
@@ -89,7 +89,7 @@ export const CITIES: City[] = [
   {
     id: "roma",
     name: "Roma",
-    listClassName: "italic",
+    listClassName: "not-italic",
     country: "Italia",
     temp: "12 °C",
     weather: "Sol tibio de invierno",
@@ -117,7 +117,7 @@ export const CITIES: City[] = [
   {
     id: "moscu",
     name: "Moscú",
-    listClassName: "italic",
+    listClassName: "not-italic",
     country: "Rusia",
     temp: "−9 °C",
     weather: "Nevada intensa",
@@ -145,7 +145,7 @@ export const CITIES: City[] = [
   {
     id: "rio",
     name: "Río de Janeiro",
-    listClassName: "italic",
+    listClassName: "not-italic",
     country: "Brasil",
     temp: "30 °C",
     weather: "Calor tropical",
@@ -173,7 +173,7 @@ export const CITIES: City[] = [
   {
     id: "cancun",
     name: "Cancún",
-    listClassName: "italic",
+    listClassName: "not-italic",
     country: "México",
     temp: "28 °C",
     weather: "Sol caribeño",
@@ -200,9 +200,9 @@ export const CITIES: City[] = [
   },
   {
     id: "bangkok",
-    name: "Tailandia",
-    listClassName: "italic",
-    country: "Bangkok",
+    name: "Bangkok",
+    listClassName: "not-italic",
+    country: "Tailandia",
     temp: "32 °C",
     weather: "Calor húmedo y cielo claro",
     coords: "13.75° N · 100.50° E",
