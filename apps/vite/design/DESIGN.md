@@ -27,6 +27,12 @@ colors:
         "500": 40 20.4% 62.5%
         "700": 37.8 16.8% 31.6%
         "900": 33.8 23.5% 13.3%
+      semantic-card:
+        "100": 0 0% 100%
+        "300": 0 0% 83.9%
+        "500": 0 0% 54.1%
+        "700": 0 0% 28.6%
+        "900": 0 0% 18%
     status:
       danger:
         "100": 10 71.4% 91.8%
@@ -51,15 +57,15 @@ colors:
     accent-foreground: "{color.neutral.neutral.900}"
     background: "{color.neutral.neutral.100}"
     border: "{color.neutral.neutral.300}"
-    card: "{color.neutral.neutral.100}"
+    card: "{color.neutral.semantic-card.100}"
     card-foreground: "{color.neutral.neutral.900}"
     destructive: "{color.status.danger.700}"
     destructive-foreground: "{color.neutral.neutral.100}"
     foreground: "{color.neutral.neutral.900}"
     input: "{color.neutral.neutral.300}"
-    muted: "{color.neutral.neutral.300}"
+    muted: "{color.neutral.semantic-card.300}"
     muted-foreground: "{color.neutral.neutral.700}"
-    popover: "{color.neutral.neutral.100}"
+    popover: "{color.neutral.semantic-card.100}"
     popover-foreground: "{color.neutral.neutral.900}"
     primary: "{color.expressive.primary.500}"
     primary-foreground: "{color.neutral.neutral.100}"
