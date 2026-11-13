@@ -58,13 +58,13 @@ function Glass() {
         color="#ffffff"
         transmission={1}
         thickness={0.6}
-        roughness={0.02}
+        roughness={0.035}
         ior={1.42}
         metalness={0}
         clearcoat={1}
-        clearcoatRoughness={0.02}
-        envMapIntensity={1.6}
-        specularIntensity={1}
+        clearcoatRoughness={0.06}
+        envMapIntensity={1.25}
+        specularIntensity={0.8}
         attenuationColor="#fff4e0"
         attenuationDistance={4}
       />
@@ -177,15 +177,17 @@ function GlobeRig({ shake, children }: { shake: MutableRefObject<ShakeState>; ch
 function Lights() {
   return (
     <>
-      <hemisphereLight args={["#fff4e2", "#6b4a2e", 0.55]} />
+      <hemisphereLight args={["#fff4e2", "#6b4a2e", 0.6]} />
       <directionalLight
         position={[3.5, 6, 4.5]}
-        intensity={2.4}
+        intensity={2.1}
         color="#fff1dc"
         castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-bias={-0.0004}
-        shadow-normalBias={0.02}
+        shadow-mapSize={[2048, 2048]}
+        shadow-radius={6}
+        shadow-blurSamples={16}
+        shadow-bias={-0.0003}
+        shadow-normalBias={0.025}
         shadow-camera-left={-2.2}
         shadow-camera-right={2.2}
         shadow-camera-top={2.2}
@@ -196,10 +198,10 @@ function Lights() {
       <directionalLight position={[-4, 2, -3]} intensity={0.7} color="#ffd7a8" />
       <Environment resolution={256} frames={1}>
         <color attach="background" args={["#3b2c20"]} />
-        <Lightformer form="rect" intensity={2.2} position={[0, 5, 1]} scale={[8, 3, 1]} />
-        <Lightformer form="rect" intensity={4} position={[-4, 1.5, 3]} scale={[1.6, 4, 1]} color="#fff6e8" />
-        <Lightformer form="rect" intensity={2.5} position={[4.5, 1, -1]} scale={[1.2, 5, 1]} color="#ffd59a" />
-        <Lightformer form="ring" intensity={3} position={[2.5, 2.5, 5]} scale={0.9} />
+        <Lightformer form="rect" intensity={1.8} position={[0, 5, 1]} scale={[9, 4, 1]} />
+        <Lightformer form="rect" intensity={2.4} position={[-4, 1.5, 3]} scale={[2.6, 5, 1]} color="#fff6e8" />
+        <Lightformer form="rect" intensity={1.6} position={[4.5, 1, -1]} scale={[2, 6, 1]} color="#ffd59a" />
+        <Lightformer form="circle" intensity={1.6} position={[2.5, 2.5, 5]} scale={1.8} color="#fff3e2" />
         <Lightformer form="rect" intensity={1.2} position={[0, -4, 2]} scale={[8, 2, 1]} color="#f3e3c6" />
       </Environment>
     </>
@@ -259,7 +261,7 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
       onPointerCancel={onUp} data-oid="a5a0ccf6d0" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true"
     >
       <Canvas
-        shadows
+        shadows="variance"
         dpr={[1, 2]}
         camera={{ position: [0, 0.2, 8.2], fov: 30 }}
         gl={{ antialias: true }}
@@ -272,7 +274,9 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
           <Stage city={city} shake={shake} />
           <Glass />
         </GlobeRig>
-        <ContactShadows position={[0, -1.76, 0]} opacity={0.45} scale={6} blur={2.6} far={1.5} color="#5a3d24" />
+        {/* Tight occlusion right under the base + a wide, soft penumbra */}
+        <ContactShadows position={[0, -1.755, 0]} opacity={0.6} scale={3.8} blur={1.1} far={0.35} resolution={512} color="#3e2a18" />
+        <ContactShadows position={[0, -1.76, 0]} opacity={0.32} scale={7.5} blur={3.4} far={2.2} resolution={512} color="#5a3d24" />
       </Canvas>
     </div>
   )
