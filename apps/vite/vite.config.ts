@@ -1,3 +1,4 @@
+import mercuryViewportPlugin from './client/mercury-viewport-plugin'
 import { defineConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
@@ -18,7 +19,7 @@ export default defineConfig({
   // Absolute so the router basename and asset URLs resolve on deep links.
   // Publish and HTML export pass their own base.
   base: "/",
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), mercuryViewportPlugin()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./client"),
