@@ -78,7 +78,7 @@ export function BasePlaque() {
   useEffect(() => {
     let live = true
     const family = getComputedStyle(document.documentElement).getPropertyValue("--ds-font-cormorant-garamond").trim()
-    const font = `italic 500 260px ${family}`
+    const font = `italic 500 280px ${family}`
     const mask = document.createElement("canvas")
     mask.width = WIDTH
     mask.height = HEIGHT
@@ -95,26 +95,29 @@ export function BasePlaque() {
       g.lineCap = "round"
       g.lineJoin = "round"
       const textWidth = g.measureText(INSCRIPTION).width
-      const scale = Math.min(1, 1680 / textWidth)
-      g.translate((WIDTH - textWidth * scale) / 2, 322)
+      const scale = Math.min(1, 1640 / (textWidth + 100))
+      g.translate((WIDTH - textWidth * scale) / 2 - 20, 328)
       g.scale(scale, 1)
+      // A more flowing calligraphic slant, using the loaded system typeface.
+      g.transform(1, 0, -0.18, 1, 0, 0)
       g.fillText(INSCRIPTION, 0, 0)
 
-      // Fine joining hairlines and long copperplate-style pen swashes borrow
-      // the reference's engraved signature, retaining the design-system face.
+      // Fine baseline joins give the engraving a connected, handwritten rhythm;
+      // ornaments stay within the lettering, with no underline beneath it.
       g.lineWidth = 2.2
       let pen = 0
       const letters = [...INSCRIPTION]
       letters.forEach((letter, index) => {
-        const advance = g.measureText(letter).width
+        const end = g.measureText(INSCRIPTION.slice(0, index + 1)).width
+        const advance = end - pen
         const next = letters[index + 1]
-        if (index > 0 && next && letter !== " " && next !== " ") {
+        if (next && letter !== " " && next !== " ") {
           g.beginPath()
           g.moveTo(pen + advance * 0.68, -8)
           g.bezierCurveTo(pen + advance * 0.91, -3, pen + advance + 8, -24, pen + advance + 18, -49)
           g.stroke()
         }
-        pen += advance
+        pen = end
       })
       g.lineWidth = 2.8
       g.beginPath()
@@ -122,13 +125,6 @@ export function BasePlaque() {
       g.moveTo(99, -153)
       g.bezierCurveTo(17, -201, -91, -84, -39, -54)
       g.bezierCurveTo(-13, -37, 34, -60, 43, -84)
-      // Long, delicate underline with a crossed oval, like a jeweller's flourish.
-      g.moveTo(textWidth * 0.20, 52)
-      g.bezierCurveTo(textWidth * 0.40, -12, textWidth * 0.88, 108, textWidth * 0.96, 34)
-      g.bezierCurveTo(textWidth * 1.02, -20, textWidth * 0.63, 14, textWidth * 0.60, 63)
-      g.bezierCurveTo(textWidth * 0.58, 105, textWidth * 0.83, 77, textWidth * 0.90, 51)
-      g.moveTo(textWidth * 0.61, 92)
-      g.bezierCurveTo(textWidth * 0.50, 117, textWidth * 0.39, 110, textWidth * 0.34, 135)
       g.stroke()
       g.restore()
 
