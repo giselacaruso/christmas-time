@@ -53,7 +53,7 @@ export default function Index() {
             Agitar la esfera
             <MoveUpRight aria-hidden="true" className="size-3" strokeWidth={1.2} data-oid="041e06d842" />
           </button>
-          <p className="type-caption text-muted-foreground" data-oid="e9ecf64720">O arrástrala suavemente</p>
+          
         </div>
       </footer>
 
