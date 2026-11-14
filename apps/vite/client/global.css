@@ -95,8 +95,8 @@
   --text-caption--letter-spacing: 0.04em;
   --font-caption: var(--ds-font-dm-sans);
   --font-style-caption: normal;
-  --text-display: 4.375rem;
-  --text-display--line-height: 0.714286;
+  --text-display: 3.75rem;
+  --text-display--line-height: 0.666667;
   --text-display--letter-spacing: -0.025em;
   --font-display: var(--ds-font-playfair-display);
   --font-style-display: normal;
