@@ -1,13 +1,19 @@
 .christmas-editorial {
   color-scheme: light;
+  --globe-gradient-x: 110%;
+  --globe-gradient-y: 44%;
+  --globe-gradient-peak: 22%;
+  --globe-gradient-soft: 10%;
+  --globe-gradient-middle: 32%;
+  --globe-gradient-end: 67%;
 }
 
 .christmas-editorial .globe-backdrop {
   background: radial-gradient(
-    ellipse at 110% 44%,
-    color-mix(in srgb, var(--accent) 22%, transparent) 0%,
-    color-mix(in srgb, var(--accent) 10%, transparent) 32%,
-    transparent 67%
+    ellipse at var(--globe-gradient-x) var(--globe-gradient-y),
+    color-mix(in srgb, var(--accent) var(--globe-gradient-peak), transparent) 0%,
+    color-mix(in srgb, var(--accent) var(--globe-gradient-soft), transparent) var(--globe-gradient-middle),
+    transparent var(--globe-gradient-end)
   );
 }
 

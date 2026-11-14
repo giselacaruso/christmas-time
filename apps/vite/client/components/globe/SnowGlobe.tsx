@@ -8,6 +8,7 @@ import { Bangkok, Cancun, SanFrancisco, Toronto, Vienna } from "./NewCities"
 import { M } from "./materials"
 import { BasePlaque } from "./BasePlaque"
 import { GlobeGlass, GroundShadow, StudioLights } from "./GlobeStudio"
+import { GlobeBackdrop } from "./GlobeBackdrop"
 import { P } from "./palette"
 import { Particles } from "./Particles"
 import { GROUND_R, GROUND_Y, createShake, floorAt, type ShakeState } from "./shake"
@@ -332,6 +333,7 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
           gl.toneMappingExposure = 1
         }}
       >
+        <GlobeBackdrop />
         <StudioLights />
         <GlobeRig shake={shake}>
           <Base />

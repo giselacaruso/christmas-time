@@ -69,20 +69,20 @@ export function GlobeGlass() {
 
   return (
     <group>
-      {/* An open-bottom shell, not a complete sphere intersecting the plinth.
-          Its real dielectric reflection replaces the old luminous outline. */}
+      {/* A thin dielectric shell: the page-matched 3D backdrop supplies real
+          transmission, while studio reflections stay on the glass surface. */}
       <mesh renderOrder={10}>
         <sphereGeometry args={[R_GLASS, 160, 112, 0, Math.PI * 2, 0, glassEnd]} />
         <meshPhysicalMaterial
           color={clearGlass}
           transmission={1}
-          thickness={0.02}
-          roughness={0.022}
+          thickness={0.026}
+          roughness={0.018}
           ior={1.46}
           metalness={0}
           clearcoat={0}
-          envMapIntensity={0.98}
-          specularIntensity={1}
+          envMapIntensity={0.65}
+          specularIntensity={0.95}
           depthWrite={false}
           attenuationDistance={Infinity}
         />
