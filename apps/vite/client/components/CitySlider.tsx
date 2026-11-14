@@ -8,15 +8,15 @@ interface Props {
 
 export function CitySlider({ cities, index, onSelect }: Props) {
   return (
-    <section aria-label="Destinos de Navidad" className="relative z-10 min-w-0 py-ds-sm" data-oid="81f47660eb" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true">
+    <section aria-label="Destinos de Navidad" className="relative z-10 order-last min-w-0 py-ds-sm lg:order-first" data-oid="81f47660eb" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true">
       
 
 
       
 
-      <ul aria-label="Ciudades de la colección" className="city-list list-none p-0" data-oid="8fea900bf3">
+      <ul aria-label="Ciudades de la colección" className="city-list flex list-none flex-nowrap overflow-x-auto overscroll-x-contain touch-pan-x p-0 lg:block lg:overflow-visible lg:touch-auto" data-oid="8fea900bf3">
         {cities.map((city, itemIndex) =>
-        <li key={city.id} className="inline-flex items-start align-top" data-city={city.id} data-oid="606a97f66d" data-oid-shared="true" data-oid-instance-targetable="true" data-oid-text-editable="false" data-oid-text-source="element:button|element:sup|expression:34cb0b165c64">
+        <li key={city.id} className="inline-flex shrink-0 items-start align-top" data-city={city.id} data-oid="606a97f66d" data-oid-shared="true" data-oid-instance-targetable="true" data-oid-text-editable="false" data-oid-text-source="element:button|element:sup|expression:34cb0b165c64">
             <button
             type="button"
             aria-pressed={index === itemIndex}

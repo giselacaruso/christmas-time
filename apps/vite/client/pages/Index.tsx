@@ -15,7 +15,7 @@ export default function Index() {
     <main className="christmas-editorial relative grid h-dvh min-h-screen grid-rows-[minmax(0,1fr)_auto_auto] gap-y-ds-lg overflow-clip bg-card px-ds-lg py-ds-lg text-foreground md:px-ds-xl md:py-ds-xl 2xl:px-ds-2xl" data-oid="a258d16a5f" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true">
       <div aria-hidden="true" className="globe-backdrop pointer-events-none absolute inset-0" data-oid="3cdebcab9a" />
 
-      <div className="relative z-10 grid min-h-0 grid-rows-[auto_minmax(0,1fr)] items-center gap-x-ds-2xl lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:grid-rows-1" data-oid="59337d435b">
+      <div className="relative z-10 grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_auto] items-center gap-x-ds-2xl lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:grid-rows-1" data-oid="59337d435b">
         <CitySlider cities={CITIES} index={index} onSelect={selectCity} />
         <GlobePanel city={city} shakeKey={shakeKey} />
       </div>
@@ -57,7 +57,7 @@ export default function Index() {
         </div>
       </footer>
 
-      <p className="relative z-10 type-caption text-muted-foreground" data-oid="966e7aa028" style={{ textAlign: "right" }}>giselacaruso.com</p>
+      <p className="relative z-10 type-caption text-muted-foreground" data-oid="966e7aa028" style={{ textAlign: "right" }}><a href="https://giselacaruso.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2" data-oid="944d5f761c">With love giselacaruso.com</a></p>
     </main>);
 
 }
