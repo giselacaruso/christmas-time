@@ -12,7 +12,7 @@ export default function Index() {
   const city = CITIES[index];
 
   return (
-    <main className="christmas-editorial relative grid h-dvh min-h-screen grid-rows-[minmax(0,1fr)_auto_auto] gap-y-ds-lg overflow-clip bg-background px-ds-lg py-ds-lg text-foreground md:px-ds-xl md:py-ds-xl 2xl:px-ds-2xl" data-oid="a258d16a5f" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true">
+    <main className="christmas-editorial relative grid h-dvh min-h-screen grid-rows-[minmax(0,1fr)_auto_auto] gap-y-ds-lg overflow-clip bg-card px-ds-lg py-ds-lg text-foreground md:px-ds-xl md:py-ds-xl 2xl:px-ds-2xl" data-oid="a258d16a5f" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true">
       <div aria-hidden="true" className="globe-backdrop pointer-events-none absolute inset-0" data-oid="3cdebcab9a" />
 
       <div className="relative z-10 grid min-h-0 grid-rows-[auto_minmax(0,1fr)] items-center gap-x-ds-2xl lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:grid-rows-1" data-oid="59337d435b">
@@ -28,7 +28,7 @@ export default function Index() {
           aria-atomic="true"
           className="flex items-center gap-ds-lg text-left" data-oid="3f268a948a">
           
-          <p className="type-display whitespace-nowrap text-heading not-italic leading-none text-foreground lg:text-display" data-oid="839eb34112">{city.temp}</p>
+          <p className="type-body whitespace-nowrap text-heading not-italic leading-none tracking-normal tabular-nums lining-nums text-foreground lg:text-display" data-oid="839eb34112">{city.temp.replace(/\s+(?=°)/, "")}</p>
           <div className="flex min-w-0 flex-col items-start gap-ds-xs" data-oid="c8f4d5950a">
             <h2 className="type-label uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
             <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:33651009acf3|expression:06ffb3af518d">

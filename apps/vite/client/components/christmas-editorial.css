@@ -5,8 +5,8 @@
 .christmas-editorial .globe-backdrop {
   background: radial-gradient(
     ellipse at 110% 44%,
-    color-mix(in srgb, var(--border) 80%, var(--accent)) 0%,
-    color-mix(in srgb, var(--border) 60%, var(--background)) 32%,
+    color-mix(in srgb, var(--accent) 22%, transparent) 0%,
+    color-mix(in srgb, var(--accent) 10%, transparent) 32%,
     transparent 67%
   );
 }
