@@ -321,7 +321,7 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
       <Canvas
         shadows
         dpr={[1, 2]}
-        camera={{ position: [0, 0, 9.2], fov: 32 }}
+        camera={{ position: [0, 0, 9.2], fov: 32, zoom: 1.1 }}
         gl={{ antialias: true, alpha: true }}
         onCreated={({ gl }) => {
           gl.setClearColor(P.porcelain, 0)
