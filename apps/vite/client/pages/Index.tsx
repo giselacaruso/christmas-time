@@ -26,17 +26,17 @@ export default function Index() {
           aria-label="Información del destino seleccionado"
           aria-live="polite"
           aria-atomic="true"
-          className="flex items-center gap-ds-lg text-left" data-oid="3f268a948a"
-        >
+          className="flex items-center gap-ds-lg text-left" data-oid="3f268a948a">
+          
           <p className="type-display whitespace-nowrap text-heading not-italic leading-none text-foreground lg:text-display" data-oid="839eb34112">{city.temp}</p>
           <div className="flex min-w-0 flex-col items-start gap-ds-xs" data-oid="c8f4d5950a">
             <h2 className="type-label uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
             <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:33651009acf3|expression:06ffb3af518d">
-              {city.climate === "snow" ? (
-                <Snowflake aria-label="Invierno" className="size-4 shrink-0" strokeWidth={1.2} data-oid="3fabbe106b" />
-              ) : (
-                <Sun aria-label="Clima cálido" className="size-4 shrink-0" strokeWidth={1.2} data-oid="da82436992" />
-              )}
+              {city.climate === "snow" ?
+              <Snowflake aria-label="Invierno" className="size-4 shrink-0" strokeWidth={1.2} data-oid="3fabbe106b" /> :
+
+              <Sun aria-label="Clima cálido" className="size-4 shrink-0" strokeWidth={1.2} data-oid="da82436992" />
+              }
               {city.weather}
             </p>
             <p className="type-caption text-muted-foreground" data-oid="cb6fce8725">{city.coords}</p>
@@ -47,8 +47,8 @@ export default function Index() {
           <button
             type="button"
             onClick={() => setShakeKey((key) => key + 1)}
-            className="ds-button ds-button-secondary gap-ds-sm rounded-none border-0 bg-transparent px-ds-sm py-ds-sm type-label uppercase text-foreground hover:translate-y-0 hover:bg-transparent hover:text-accent active:text-primary focus-visible:outline-ring" data-oid="b414e74131"
-          >
+            className="ds-button ds-button-secondary gap-ds-sm rounded-none border-0 bg-transparent px-ds-sm py-ds-sm type-label uppercase text-foreground hover:translate-y-0 hover:bg-transparent hover:text-accent active:text-primary focus-visible:outline-ring" data-oid="b414e74131">
+            
             <Sparkles aria-hidden="true" className="size-4" strokeWidth={1.2} data-oid="d18e41896e" />
             Agitar la esfera
             <MoveUpRight aria-hidden="true" className="size-3" strokeWidth={1.2} data-oid="041e06d842" />
@@ -57,7 +57,7 @@ export default function Index() {
         </div>
       </footer>
 
-      <p className="relative z-10 type-caption text-muted-foreground" data-oid="966e7aa028">giselacaruso.com</p>
-    </main>
-  );
+      <p className="relative z-10 type-caption text-muted-foreground" data-oid="966e7aa028" style={{ textAlign: "right" }}>giselacaruso.com</p>
+    </main>);
+
 }
