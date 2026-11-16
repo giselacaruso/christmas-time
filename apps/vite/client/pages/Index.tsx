@@ -20,16 +20,16 @@ export default function Index() {
         <GlobePanel city={city} shakeKey={shakeKey} />
       </div>
 
-      <footer className="relative z-10 grid items-center gap-x-ds-2xl gap-y-ds-md lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]" data-oid="e1b574fd8b">
+      <footer className="relative z-10 grid items-center justify-items-center gap-x-ds-2xl gap-y-ds-md lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:justify-items-stretch" data-oid="e1b574fd8b">
         <section
           id="selected-city-info"
           aria-label="Información del destino seleccionado"
           aria-live="polite"
           aria-atomic="true"
-          className="flex items-center gap-ds-lg text-left" data-oid="3f268a948a">
+          className="flex flex-col items-center gap-ds-md text-center lg:flex-row lg:gap-ds-lg lg:text-left" data-oid="3f268a948a">
           
           <p className="type-body whitespace-nowrap text-heading not-italic leading-none tracking-normal tabular-nums lining-nums text-foreground lg:text-display" data-oid="839eb34112">{city.temp.replace(/\s+(?=°)/, "")}</p>
-          <div className="flex min-w-0 flex-col items-start gap-ds-xs" data-oid="c8f4d5950a">
+          <div className="flex min-w-0 flex-col items-center gap-ds-xs lg:items-start" data-oid="c8f4d5950a">
             <h2 className="type-label uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
             <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:33651009acf3|expression:06ffb3af518d">
               {city.climate === "snow" ?
@@ -43,7 +43,7 @@ export default function Index() {
           </div>
         </section>
 
-        <div className="flex flex-col items-start gap-ds-xs lg:items-center" data-oid="3720033362">
+        <div className="flex flex-col items-center gap-ds-xs" data-oid="3720033362">
           <button
             type="button"
             onClick={() => setShakeKey((key) => key + 1)}
@@ -57,7 +57,7 @@ export default function Index() {
         </div>
       </footer>
 
-      <p className="relative z-10 type-caption text-muted-foreground" data-oid="966e7aa028" style={{ textAlign: "right" }}><a href="https://giselacaruso.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2" data-oid="944d5f761c">With love giselacaruso.com</a></p>
+      <p className="relative z-10 type-caption text-center text-muted-foreground lg:text-right" data-oid="966e7aa028"><a href="https://giselacaruso.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2" data-oid="944d5f761c">With love giselacaruso.com</a></p>
     </main>);
 
 }

@@ -29,6 +29,13 @@
   text-wrap: balance;
 }
 
+@media (width < 64rem) {
+  .christmas-editorial .city-option {
+    /* One destination per stop, with a glimpse of the adjacent city. */
+    min-width: calc(100% - var(--ds-space-2xl));
+  }
+}
+
 .christmas-editorial .city-number {
   /* Reset Tailwind's raised superscript: every index starts at cap height. */
   position: static;
