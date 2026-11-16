@@ -12,7 +12,124 @@ const neckRadius = Math.sqrt(R_GLASS * R_GLASS - GLASS_SEAT * GLASS_SEAT)
 const clearGlass = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0.96)
 const studioGround = new THREE.Color(P.porcelain).lerp(new THREE.Color(P.shadow), 0.3)
 
+// Painted-light volume pass: curved softbox windows, a rim streak, Fresnel
+// sheen, an inner wall contour and a warm caustic. These are the cues that
+// make a real glass sphere read as round, not as a flat clear disc.
+const volumeVertex = `
+  varying vec3 vVolNormal;
+  varying vec3 vVolView;
+  void main() {
+    vec4 viewPosition = modelViewMatrix * vec4(position, 1.0);
+    vVolNormal = normalize(normalMatrix * normal);
+    vVolView = -viewPosition.xyz;
+    gl_Position = projectionMatrix * viewPosition;
+  }
+`
+
+const volumeFragment = `
+  uniform vec3 uLight;
+  uniform vec3 uDark;
+  uniform vec3 uGold;
+  uniform float uBack;
+  varying vec3 vVolNormal;
+  varying vec3 vVolView;
+
+  float roundedRect(vec2 p, vec2 halfSize, float radius) {
+    vec2 d = abs(p) - halfSize + radius;
+    return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0) - radius;
+  }
+  mat2 rot(float a) { float c = cos(a); float s = sin(a); return mat2(c, -s, s, c); }
+
+  void main() {
+    vec3 n = normalize(vVolNormal);
+    vec3 v = normalize(vVolView);
+    float facing = abs(dot(n, v));
+    vec2 s = n.xy;
+    float rr = length(s);
+    float ang = atan(s.y, s.x);
+    float aW = 0.0;
+    float aD = 0.0;
+    float aG = 0.0;
+
+    if (uBack < 0.5) {
+      // Main softbox window, bent along the sphere toward the rim.
+      vec2 w = rot(0.62) * (s - vec2(-0.47, 0.47));
+      w.y += w.x * w.x * 0.9;
+      float win = roundedRect(w, vec2(0.085, 0.2), 0.05);
+      aW += (1.0 - smoothstep(-0.015, 0.035, win)) * 0.62;
+      aW += (1.0 - smoothstep(0.0, 0.22, win)) * 0.1;
+      // Second, narrower pane beside it.
+      vec2 w2 = rot(0.62) * (s - vec2(-0.27, 0.62));
+      w2.y += w2.x * w2.x * 0.9;
+      float pane = roundedRect(w2, vec2(0.035, 0.12), 0.03);
+      aW += (1.0 - smoothstep(-0.01, 0.03, pane)) * 0.42;
+      // Pin-point glints.
+      vec2 g1 = s - vec2(-0.33, 0.3);
+      aW += exp(-dot(g1, g1) / 0.0007) * 0.75;
+      vec2 g2 = s - vec2(0.42, 0.58);
+      aW += exp(-dot(g2, g2) / 0.0012) * 0.4;
+
+      // Long curved reflection hugging the right rim.
+      float arcBand = smoothstep(0.8, 0.86, rr) * (1.0 - smoothstep(0.9, 0.94, rr));
+      float arcSpan = smoothstep(-0.85, -0.45, ang) * (1.0 - smoothstep(0.35, 0.8, ang));
+      aW += arcBand * arcSpan * 0.5;
+      // Thin upper-left rim reflection.
+      float topBand = smoothstep(0.9, 0.935, rr) * (1.0 - smoothstep(0.955, 0.975, rr));
+      float topSpan = smoothstep(1.55, 1.95, ang) * (1.0 - smoothstep(2.4, 2.85, ang));
+      aW += topBand * topSpan * 0.55;
+
+      // Fresnel sheen lifts the contents near the rim: the glass bulges.
+      float fres = pow(1.0 - facing, 3.5);
+      aW += fres * 0.3;
+
+      // Inner wall contour: a faint second outline that gives the shell thickness.
+      float wall = exp(-pow((rr - 0.958) / 0.012, 2.0));
+      float shadedSide = 1.0 - smoothstep(-0.4, 0.8, dot(normalize(s + 1e-5), normalize(vec2(-0.7, 0.75))));
+      aD += wall * (0.05 + shadedSide * 0.1);
+      // Grazing darkening on the lower right — light falling off the curve.
+      aD += pow(1.0 - facing, 6.0) * shadedSide * 0.12;
+
+      // Warm caustic focusing toward the base, like light through water.
+      float caustic = smoothstep(0.6, 0.9, rr) * smoothstep(-3.0, -2.6, ang) * (1.0 - smoothstep(-1.4, -1.0, ang));
+      aG += caustic * 0.16;
+    } else {
+      // Far inside wall: mirrored, dimmer window and a soft warm bounce.
+      vec2 w = rot(-0.5) * (s - vec2(0.5, -0.12));
+      float win = roundedRect(w, vec2(0.08, 0.24), 0.06);
+      aW += (1.0 - smoothstep(-0.02, 0.08, win)) * 0.2;
+      float fres = pow(1.0 - facing, 3.0);
+      aW += fres * 0.1;
+      aG += smoothstep(0.55, 0.95, rr) * (1.0 - smoothstep(-0.8, 0.2, s.y)) * 0.07;
+    }
+
+    float alpha = clamp(aW + aD + aG, 0.0, 0.92);
+    vec3 color = (uLight * aW + uDark * aD + uGold * aG) / max(aW + aD + aG, 1e-4);
+    gl_FragColor = vec4(color, alpha);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+  }
+`
+
+function makeVolume(back: boolean) {
+  return new THREE.ShaderMaterial({
+    transparent: true,
+    depthWrite: false,
+    side: back ? THREE.BackSide : THREE.FrontSide,
+    uniforms: {
+      uLight: { value: new THREE.Color(1, 1, 1) },
+      uDark: { value: new THREE.Color(P.shadow).lerp(new THREE.Color(P.porcelain), 0.2) },
+      uGold: { value: new THREE.Color(P.gold) },
+      uBack: { value: back ? 1 : 0 },
+    },
+    vertexShader: volumeVertex,
+    fragmentShader: volumeFragment,
+  })
+}
+
 export function GlobeGlass() {
+  const volumeFront = useMemo(() => makeVolume(false), [])
+  const volumeBack = useMemo(() => makeVolume(true), [])
+  useEffect(() => () => { volumeFront.dispose(); volumeBack.dispose() }, [volumeFront, volumeBack])
   const pixelRatio = useThree((state) => state.viewport.dpr)
   const edge = useMemo(() => new THREE.ShaderMaterial({
     transparent: true,
@@ -76,18 +193,25 @@ export function GlobeGlass() {
         <meshPhysicalMaterial
           color={clearGlass}
           transmission={1}
-          thickness={0.026}
-          roughness={0.018}
+          thickness={0.11}
+          roughness={0.012}
           ior={1.46}
           metalness={0}
-          clearcoat={0}
-          envMapIntensity={0.65}
-          specularIntensity={0.95}
+          clearcoat={1}
+          clearcoatRoughness={0.03}
+          envMapIntensity={1.05}
+          specularIntensity={1}
           depthWrite={false}
           attenuationDistance={Infinity}
         />
       </mesh>
-      <mesh material={edge} renderOrder={12}>
+      <mesh material={volumeBack} renderOrder={13}>
+        <sphereGeometry args={[R_GLASS - 0.004, 128, 96, 0, Math.PI * 2, 0, glassEnd]} />
+      </mesh>
+      <mesh material={volumeFront} renderOrder={14}>
+        <sphereGeometry args={[R_GLASS + 0.002, 160, 112, 0, Math.PI * 2, 0, glassEnd]} />
+      </mesh>
+      <mesh material={edge} renderOrder={15}>
         <sphereGeometry args={[R_GLASS + 0.001, 160, 112, 0, Math.PI * 2, 0, glassEnd]} />
       </mesh>
       {/* The tiny rolled glass lip gives the shell actual thickness at its seat. */}
