@@ -22,7 +22,7 @@ export function CitySlider({ cities, index, onSelect }: Props) {
             aria-pressed={index === itemIndex}
             aria-controls="selected-city-info"
             onClick={() => onSelect(itemIndex)}
-            className="ds-button ds-button-secondary city-name type-display inline-block min-h-0 overflow-visible whitespace-nowrap rounded-none border-0 bg-transparent px-0 py-ds-md text-left text-heading not-italic text-foreground shadow-none hover:translate-y-0 hover:bg-transparent focus-visible:outline-accent sm:text-display lg:text-heading 2xl:text-display" data-oid="60624a8c5b" data-oid-shared="true" data-oid-instance-targetable="true">
+            className="ds-button ds-button-secondary city-name type-display inline-block min-h-0 overflow-visible whitespace-nowrap rounded-none border-0 bg-transparent px-0 py-ds-md text-left text-display not-italic text-foreground shadow-none hover:translate-y-0 hover:bg-transparent focus-visible:outline-accent lg:text-heading 2xl:text-display" data-oid="60624a8c5b" data-oid-shared="true" data-oid-instance-targetable="true">
             
               {city.name}
             </button>

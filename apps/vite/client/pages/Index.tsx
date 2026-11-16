@@ -26,10 +26,10 @@ export default function Index() {
           aria-label="Información del destino seleccionado"
           aria-live="polite"
           aria-atomic="true"
-          className="flex flex-col items-center gap-ds-md text-center lg:flex-row lg:gap-ds-lg lg:text-left" data-oid="3f268a948a">
+          className="flex flex-row items-center gap-ds-md text-left lg:gap-ds-lg" data-oid="3f268a948a">
           
-          <p className="type-body whitespace-nowrap text-heading not-italic leading-none tracking-normal tabular-nums lining-nums text-foreground lg:text-display" data-oid="839eb34112">{city.temp.replace(/\s+(?=°)/, "")}</p>
-          <div className="flex min-w-0 flex-col items-center gap-ds-xs lg:items-start" data-oid="c8f4d5950a">
+          <p className="type-body whitespace-nowrap text-display not-italic leading-none tracking-normal tabular-nums lining-nums text-foreground" data-oid="839eb34112">{city.temp.replace(/\s+(?=°)/, "")}</p>
+          <div className="flex min-w-0 flex-col items-start gap-ds-xs" data-oid="c8f4d5950a">
             <h2 className="type-label uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
             <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:33651009acf3|expression:06ffb3af518d">
               {city.climate === "snow" ?
