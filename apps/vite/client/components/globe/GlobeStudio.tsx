@@ -88,6 +88,10 @@ const volumeFragment = `
       aD += wall * (0.05 + shadedSide * 0.1);
       // Grazing darkening on the lower right — light falling off the curve.
       aD += pow(1.0 - facing, 6.0) * shadedSide * 0.12;
+      // Thick-glass depth: a soft, all-round darkening that deepens toward
+      // the rim (stronger on the shaded side) without a hard ring.
+      float depthFall = smoothstep(0.62, 0.985, rr);
+      aD += depthFall * depthFall * (0.09 + shadedSide * 0.08);
 
       // Warm caustic focusing toward the base, like light through water.
       float caustic = smoothstep(0.6, 0.9, rr) * smoothstep(-3.0, -2.6, ang) * (1.0 - smoothstep(-1.4, -1.0, ang));
@@ -193,9 +197,9 @@ export function GlobeGlass() {
         <meshPhysicalMaterial
           color={clearGlass}
           transmission={1}
-          thickness={0.11}
+          thickness={0.34}
           roughness={0.012}
-          ior={1.46}
+          ior={1.52}
           metalness={0}
           clearcoat={1}
           clearcoatRoughness={0.03}

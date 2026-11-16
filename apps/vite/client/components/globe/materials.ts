@@ -215,6 +215,16 @@ function lustre(color: string, roughness = 0.22) {
   })
 }
 
+// Richer glaze colour for the pieces inside the globe: same four hue families,
+// pushed in saturation so they read through the glass and studio reflections.
+function rich(color: string, saturation: number, lightness = 0) {
+  const c = new THREE.Color(color)
+  const hsl = { h: 0, s: 0, l: 0 }
+  c.getHSL(hsl)
+  c.setHSL(hsl.h, Math.min(1, hsl.s * saturation), Math.min(1, Math.max(0, hsl.l + lightness)))
+  return c.getStyle()
+}
+
 export const M = {
   cream: ceramic(P.cream),
   creamDouble: ceramic(P.cream, { side: THREE.DoubleSide }),
@@ -227,13 +237,13 @@ export const M = {
     clearcoat: 0.08,
     envMapIntensity: 0.65,
   }),
-  red: ceramic(P.red, { speckled: false, roughness: 0.24 }),
-  redDeep: ceramic(P.redDeep, { speckled: false, roughness: 0.32 }),
-  green: ceramic(P.fir, { speckled: false, roughness: 0.24 }),
-  greenDeep: ceramic(P.firDeep, { speckled: false, roughness: 0.32 }),
-  sand: ceramic(P.sand, { roughness: 0.55 }),
-  gold: lustre(P.gold),
-  goldSoft: lustre(P.goldSoft, 0.38),
+  red: ceramic(rich(P.red, 1.35, 0.02), { speckled: false, roughness: 0.22 }),
+  redDeep: ceramic(rich(P.redDeep, 1.6), { speckled: false, roughness: 0.3 }),
+  green: ceramic(rich(P.fir, 1.45, 0.03), { speckled: false, roughness: 0.22 }),
+  greenDeep: ceramic(rich(P.firDeep, 1.6), { speckled: false, roughness: 0.3 }),
+  sand: ceramic(rich(P.sand, 1.4), { roughness: 0.55 }),
+  gold: lustre(rich(P.gold, 1.3)),
+  goldSoft: lustre(rich(P.goldSoft, 1.3), 0.38),
 }
 
 export const flakeMaterial = new THREE.MeshPhysicalMaterial({
