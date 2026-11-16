@@ -9,7 +9,9 @@ const GLASS_SEAT = -1.06
 const glassEnd = Math.acos(GLASS_SEAT / R_GLASS)
 const neckRadius = Math.sqrt(R_GLASS * R_GLASS - GLASS_SEAT * GLASS_SEAT)
 // Optically clear glass, not a second layer of the cream ceramic glaze.
-const clearGlass = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0.96)
+const clearGlass = new THREE.Color(1, 1, 1)
+// Neutral key light keeps the white glaze white instead of cream-tinted.
+const keyWhite = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0.85).getStyle()
 const studioGround = new THREE.Color(P.porcelain).lerp(new THREE.Color(P.shadow), 0.3)
 
 // Painted-light volume pass: curved softbox windows, a rim streak, Fresnel
@@ -230,11 +232,11 @@ export function GlobeGlass() {
 export function StudioLights() {
   return (
     <>
-      <hemisphereLight args={[P.porcelain, P.shadow, 0.18]} />
+      <hemisphereLight args={[keyWhite, P.shadow, 0.18]} />
       <directionalLight
         position={[-3.8, 6, 5]}
         intensity={2.3}
-        color={P.porcelain}
+        color={keyWhite}
         castShadow
         shadow-mapSize={[4096, 4096]}
         shadow-bias={-0.00008}

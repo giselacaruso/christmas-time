@@ -133,10 +133,10 @@ const SPECKLE = makeCanvas(512, (g, s) => {
   g.fillStyle = "#ffffff"
   g.fillRect(0, 0, s, s)
   for (let i = 0; i < 55; i++) {
-    wrapBlob(g, s, rnd() * s, rnd() * s, 24 + rnd() * 70, "rgba(206,178,132,0.12)", "rgba(206,178,132,0)")
+    wrapBlob(g, s, rnd() * s, rnd() * s, 24 + rnd() * 70, "rgba(206,178,132,0.05)", "rgba(206,178,132,0)")
   }
-  for (let i = 0; i < 1500; i++) {
-    g.fillStyle = `rgba(${90 + rnd() * 50},${62 + rnd() * 30},40,${0.1 + rnd() * 0.28})`
+  for (let i = 0; i < 900; i++) {
+    g.fillStyle = `rgba(${90 + rnd() * 50},${62 + rnd() * 30},40,${0.06 + rnd() * 0.16})`
     g.beginPath()
     g.arc(rnd() * s, rnd() * s, 0.3 + rnd() * 1.1, 0, Math.PI * 2)
     g.fill()
@@ -193,7 +193,7 @@ function ceramic(color: string, { speckled = true, roughness = 0.28, side = THRE
     clearcoatNormalMap: normal,
     clearcoatNormalScale: new THREE.Vector2(0.025, 0.025),
     specularIntensity: 1,
-    specularColor: new THREE.Color(P.porcelain),
+    specularColor: new THREE.Color(1, 1, 1),
     sheen: 0,
     envMapIntensity: 1.25,
     side,
@@ -215,6 +215,10 @@ function lustre(color: string, roughness = 0.22) {
   })
 }
 
+// Bright white glaze for the scene pieces: crisp contrast against the reds
+// and greens instead of a cream cast.
+const WHITE = new THREE.Color(P.porcelain).lerp(new THREE.Color(1, 1, 1), 0.92).getStyle()
+
 // Richer glaze colour for the pieces inside the globe: same four hue families,
 // pushed in saturation so they read through the glass and studio reflections.
 function rich(color: string, saturation: number, lightness = 0) {
@@ -226,11 +230,11 @@ function rich(color: string, saturation: number, lightness = 0) {
 }
 
 export const M = {
-  cream: ceramic(P.cream),
-  creamDouble: ceramic(P.cream, { side: THREE.DoubleSide }),
-  ivory: ceramic(P.porcelain, { roughness: 0.36 }),
+  cream: ceramic(WHITE),
+  creamDouble: ceramic(WHITE, { side: THREE.DoubleSide }),
+  ivory: ceramic(WHITE, { roughness: 0.36 }),
   snow: new THREE.MeshPhysicalMaterial({
-    color: P.porcelain,
+    color: WHITE,
     roughness: 0.82,
     normalMap: variant(NORMAL, false, 7),
     normalScale: new THREE.Vector2(0.18, 0.18),
@@ -247,8 +251,8 @@ export const M = {
 }
 
 export const flakeMaterial = new THREE.MeshPhysicalMaterial({
-  color: P.porcelain,
-  emissive: P.porcelain,
+  color: WHITE,
+  emissive: WHITE,
   emissiveIntensity: 0.08,
   roughness: 0.62,
   clearcoat: 0.15,
