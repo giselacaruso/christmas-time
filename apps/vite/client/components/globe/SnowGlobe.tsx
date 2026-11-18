@@ -265,19 +265,26 @@ function GlobeRig({ shake, children }: { shake: MutableRefObject<ShakeState>; ch
   return <group ref={ref}>{children}</group>
 }
 
-/** Mobile frames the globe tighter so it fills the narrow viewport. */
+/**
+ * Mobile frames the globe tighter so it fills the narrow viewport.
+ * The canvas is taller than the square frame (extra headroom for the base
+ * while it swings), so zoom is scaled by the aspect to keep the globe the
+ * exact same on-screen size as before.
+ */
 function ResponsiveZoom() {
   const camera = useThree((s) => s.camera)
+  const size = useThree((s) => s.size)
   useEffect(() => {
     const mq = window.matchMedia("(width < 64rem)")
     const apply = () => {
-      camera.zoom = mq.matches ? 1.3 : 1.1
+      const aspect = size.height > 0 ? size.width / size.height : 1
+      camera.zoom = (mq.matches ? 1.3 : 1.1) * aspect
       camera.updateProjectionMatrix()
     }
     apply()
     mq.addEventListener("change", apply)
     return () => mq.removeEventListener("change", apply)
-  }, [camera])
+  }, [camera, size.width, size.height])
   return null
 }
 
@@ -334,6 +341,7 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
       onPointerCancel={onUp} data-oid="a5a0ccf6d0" data-oid-component-root="true" data-oid-callsite-deletable="true" data-oid-callsite-single="true"
     >
       <figcaption className="sr-only" data-oid="794dd65fe3" data-oid-text-editable="false" data-oid-text-source="text|expression:19a915dc9eac|text">Esfera navideña de {city.name}, con miniaturas de cerámica y una chapita dorada grabada: Christmas Time.</figcaption>
+      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 -top-[14%] -bottom-[14%]" data-oid="e47be07bfe">
       <Canvas
         shadows
         dpr={[1, 2]}
@@ -359,6 +367,7 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
         </GlobeRig>
         <GroundShadow />
       </Canvas>
+      </div>
     </figure>
   )
 }

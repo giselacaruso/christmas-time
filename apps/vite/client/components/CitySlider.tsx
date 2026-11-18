@@ -137,7 +137,7 @@ export function CitySlider({ cities, index, onSelect }: Props) {
                 data-clone={clone}
                 className="city-option inline-flex shrink-0 snap-center items-start justify-start align-top lg:data-[clone=true]:hidden"
                 data-city={city.id}
-                data-oid="606a97f66d" data-oid-shared="true" data-oid-text-editable="false" data-oid-text-source="element:button|element:sup|expression:1e3dc25561bf">
+                data-oid="606a97f66d" data-oid-shared="true" data-oid-text-editable="false" data-oid-text-source="element:button|element:sup|expression:d3a94867fce7">
                 <button
                   type="button"
                   tabIndex={clone ? -1 : undefined}
