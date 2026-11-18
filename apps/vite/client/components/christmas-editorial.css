@@ -30,9 +30,11 @@
 }
 
 @media (width < 64rem) {
-  .christmas-editorial .city-option {
-    /* One destination per stop, with a glimpse of the adjacent city. */
-    min-width: calc(100% - var(--ds-space-2xl));
+  .christmas-editorial .city-list {
+    scrollbar-width: none;
+  }
+  .christmas-editorial .city-list::-webkit-scrollbar {
+    display: none;
   }
 }
 

@@ -26,12 +26,12 @@ export default function Index() {
           aria-label="Información del destino seleccionado"
           aria-live="polite"
           aria-atomic="true"
-          className="flex flex-row items-center gap-ds-md text-left lg:gap-ds-lg" data-oid="3f268a948a">
+          className="grid w-full max-w-xl grid-cols-3 grid-rows-[auto_auto] items-center gap-x-ds-md gap-y-ds-xs text-center lg:flex lg:w-auto lg:max-w-none lg:flex-row lg:gap-ds-lg lg:text-left" data-oid="3f268a948a">
           
-          <p className="type-body whitespace-nowrap text-display not-italic leading-none tracking-normal tabular-nums lining-nums text-foreground" data-oid="839eb34112">{city.temp.replace(/\s+(?=°)/, "")}</p>
-          <div className="flex min-w-0 flex-col items-start gap-ds-xs" data-oid="c8f4d5950a">
-            <h2 className="type-label uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
-            <p className="flex items-center gap-ds-sm type-caption text-muted-foreground" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:33651009acf3|expression:06ffb3af518d">
+          <p className="type-body col-start-1 row-span-2 row-start-1 whitespace-nowrap border-r border-border pr-ds-md text-heading not-italic leading-none tracking-normal tabular-nums lining-nums text-foreground lg:border-r-0 lg:pr-0 lg:text-display" data-oid="839eb34112">{city.temp.replace(/\s+(?=°)/, "")}</p>
+          <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:items-start lg:gap-ds-xs" data-oid="c8f4d5950a">
+            <h2 className="type-label col-start-2 row-start-1 self-end uppercase text-foreground" data-oid="64b29a7084">{city.country}</h2>
+            <p className="col-start-3 row-span-2 row-start-1 flex h-full flex-col items-center justify-center gap-ds-xs border-l border-border pl-ds-md type-caption text-muted-foreground lg:h-auto lg:flex-row lg:gap-ds-sm lg:border-l-0 lg:pl-0" data-oid="73e717b056" data-oid-text-editable="false" data-oid-text-source="expression:33651009acf3|expression:06ffb3af518d">
               {city.climate === "snow" ?
               <Snowflake aria-label="Invierno" className="size-4 shrink-0" strokeWidth={1.2} data-oid="3fabbe106b" /> :
 
@@ -39,7 +39,7 @@ export default function Index() {
               }
               {city.weather}
             </p>
-            <p className="type-caption text-muted-foreground" data-oid="cb6fce8725">{city.coords}</p>
+            <p className="type-caption col-start-2 row-start-2 self-start text-muted-foreground" data-oid="cb6fce8725">{city.coords}</p>
           </div>
         </section>
 
