@@ -36,6 +36,10 @@
   .christmas-editorial .city-list::-webkit-scrollbar {
     display: none;
   }
+  /* Longest names (Río de Janeiro, San Francisco) stay on one line. */
+  .christmas-editorial .city-name {
+    font-size: min(var(--text-display), 12vw);
+  }
 }
 
 .christmas-editorial .city-number {

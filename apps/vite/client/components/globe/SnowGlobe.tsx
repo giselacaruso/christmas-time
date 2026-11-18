@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type MutableRefObject, type PointerEvent, type ReactNode } from "react"
-import { Canvas, useFrame } from "@react-three/fiber"
+import { Canvas, useFrame, useThree } from "@react-three/fiber"
 import * as THREE from "three"
 import type { City } from "../../data/cities"
 import { London, Moscow, NewYork, Paris } from "./ColdCities"
@@ -265,6 +265,22 @@ function GlobeRig({ shake, children }: { shake: MutableRefObject<ShakeState>; ch
   return <group ref={ref}>{children}</group>
 }
 
+/** Mobile frames the globe tighter so it fills the narrow viewport. */
+function ResponsiveZoom() {
+  const camera = useThree((s) => s.camera)
+  useEffect(() => {
+    const mq = window.matchMedia("(width < 64rem)")
+    const apply = () => {
+      camera.zoom = mq.matches ? 1.3 : 1.1
+      camera.updateProjectionMatrix()
+    }
+    apply()
+    mq.addEventListener("change", apply)
+    return () => mq.removeEventListener("change", apply)
+  }, [camera])
+  return null
+}
+
 export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) {
   const shake = useRef<ShakeState>(createShake())
   const wrap = useRef<HTMLElement>(null)
@@ -333,6 +349,7 @@ export function SnowGlobe({ city, shakeKey }: { city: City; shakeKey: number }) 
           gl.toneMappingExposure = 1
         }}
       >
+        <ResponsiveZoom />
         <GlobeBackdrop />
         <StudioLights />
         <GlobeRig shake={shake}>
