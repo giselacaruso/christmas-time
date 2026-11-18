@@ -1,3 +1,4 @@
+import { Analytics } from "@vercel/analytics/react"
 import { ThemeProvider } from "next-themes"
 import { BrowserRouter, Route, Routes } from "./lib/router"
 import Index from "./pages/Index"
@@ -13,6 +14,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
+      <Analytics />
     </ThemeProvider>
   )
 }
