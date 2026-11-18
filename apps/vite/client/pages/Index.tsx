@@ -54,7 +54,7 @@ export default function Index() {
 
       </footer>
 
-      <p className="relative z-10 type-caption text-center lg:mt-0 text-muted-foreground lg:text-right" data-oid="966e7aa028"><a href="https://giselacaruso.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2" data-oid="944d5f761c">With love giselacaruso.com</a></p>
+      <p className="relative z-10 mt-ds-lg type-caption text-center lg:mt-0 text-muted-foreground lg:text-right" data-oid="966e7aa028"><a href="https://giselacaruso.com" target="_blank" rel="noopener noreferrer" className="hover:text-accent focus-visible:outline-ring focus-visible:outline-2 focus-visible:outline-offset-2" data-oid="944d5f761c">With love giselacaruso.com</a></p>
     </main>);
 
 }
