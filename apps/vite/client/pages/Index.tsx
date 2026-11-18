@@ -35,7 +35,7 @@ export default function Index() {
           aria-label="Información del destino seleccionado"
           aria-live="polite"
           aria-atomic="true"
-          className="grid w-full grid-cols-[auto_auto_auto] grid-rows-[auto_auto] items-center justify-center gap-x-ds-md gap-y-ds-xs text-center lg:flex lg:w-auto lg:max-w-none lg:flex-row lg:gap-ds-lg lg:text-left" data-oid="7f92051768">
+          className="grid w-full grid-cols-[auto_auto_auto] grid-rows-[auto_auto] items-center justify-center gap-x-ds-md gap-y-ds-xs text-center lg:flex lg:justify-start lg:w-auto lg:max-w-none lg:flex-row lg:gap-ds-lg lg:text-left" data-oid="7f92051768">
           
           <p className="type-body col-start-1 row-span-2 row-start-1 whitespace-nowrap border-r border-border pr-ds-md text-heading not-italic leading-none tracking-normal tabular-nums lining-nums text-foreground lg:border-r-0 lg:pr-0 lg:text-display" data-oid="839eb34112">{city.temp.replace(/\s+(?=°)/, "")}</p>
           <div className="contents lg:flex lg:min-w-0 lg:flex-col lg:items-start lg:gap-ds-xs" data-oid="c8f4d5950a">
