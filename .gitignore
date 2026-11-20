@@ -17,3 +17,6 @@ dist
 # Local tooling
 .claude/settings.local.json
 .claude/launch.json
+
+# Entregables locales
+christmas-time-bug-report.docx
